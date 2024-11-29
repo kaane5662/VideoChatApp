@@ -6,7 +6,7 @@ import Link from "next/link"
 import { permanentRedirect, redirect } from "next/navigation"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { FaGoogle } from "react-icons/fa"
+import { FaGithub, FaGoogle } from "react-icons/fa"
 
 
 export default  function Login(){
@@ -29,10 +29,14 @@ export default  function Login(){
         // "use server"
         window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/google`
     }
+    const onGithubSubmit = ()=>{
+        // "use server"
+        window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/github`
+    }
 
     return(
         <main className=" bg-slate-50 text-secondary items-center flex flex-col justify-center h-screen ">
-            <form onSubmit={submitForm} className="p-12 gap-4 flex flex-col w-[45%] h-fit">
+            <form onSubmit={submitForm} className="gap-4 flex flex-col w-[40%] h-fit">
                 <div className="flex gap-2 flex-col">
                     <h1 className="font-bold text-4xl">Welcome back!</h1>
                     <p className="text-opacity-50 text-black text-lg">Let’s find your perfect co-founder.</p>
@@ -54,8 +58,11 @@ export default  function Login(){
                 <button type = "submit" className=" bg-secondary text-white p-4 rounded-md ">Log In</button>
                 <h3 className="text-center text-opacity-50 text-black">New here? <Link className="text-secondary underline" href={"/signup"}>Create an account</Link></h3>
                 <div className="flex gap-4">
-                    <h3 onClick={onGoogleSubmit} className="w-full justify-center p-3 flex gap-4 items-center border-black border-2 border-opacity-15 rounded-md"> <FaGoogle></FaGoogle> Sign In</h3>
+                    <h3 onClick={onGithubSubmit} className="w-full justify-center p-3 flex gap-4 items-center bg-secondary text-white border-opacity-15 rounded-md"> <FaGithub size={20}></FaGithub> Sign In</h3>
                 </div>
+                {/* <div className="flex gap-4">
+                    <h3 onClick={onGoogleSubmit} className="w-full justify-center p-3 flex gap-4 items-center border-black border-2 border-opacity-15 rounded-md"> <FaGoogle ></FaGoogle> Sign In</h3>
+                </div> */}
             </form>
         </main>
     )

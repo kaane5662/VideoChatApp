@@ -11,7 +11,7 @@ export interface IProfile {
     programmingLanguages: string[],
     developmentInterests: string[],
     avaliability: string,
-    id:string,
+    id:number,
     identityUserId: string,
     similarityScore: number | null,
     matches: number,
@@ -32,4 +32,26 @@ export interface IProfileSearch {
 export interface IServiceResponse {
     response: IProfile | string | number,
     staus: HttpStatusCode
+}
+
+export interface IVideoChat {
+    message: string,
+    isSender: boolean
+}
+
+export interface IDirectMessage{
+    
+    roomId:number,
+    recentText:string,
+    recentCreatedAt:string,
+    profileName:string,
+    profileIndustry: string,
+    profileId: number
+}
+
+export interface IMessage{
+    text:string,
+    createdAt:string,
+    firstName:string,
+    fromProfileId:number
 }

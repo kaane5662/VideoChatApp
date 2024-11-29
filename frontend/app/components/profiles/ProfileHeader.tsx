@@ -23,11 +23,14 @@ export default function ProfileHeader({Profile}:{Profile:IProfile}){
             <PaddedList items={Profile.developmentInterests}/>
             <h3 className="text-sm text-secondary text-opacity-50">Languages</h3>
             <PaddedList items={Profile.programmingLanguages}/> */}
-            <div className="flex justify-between gap-4">
+            <div className="flex flex-col justify-between gap-4">
                         <p className="text-sm text-secondary text-opacity-50">{Profile.industry}</p>
-                        <p className="text-sm text-secondary text-opacity-50">{Profile.avaliability}</p>
+                        <div className="w-[80%]">
+                        <PaddedList items={Profile.frameworks}/>
+
+                        </div>
             </div>
-            {Profile.similarityScore && Profile.similarityScore > 0 && (<p className="text-complementary text-white p-2 top-0 text-xs right-0 rounded-xl ml-auto bg-secondary">{Math.round(Profile?.similarityScore*100)}% Match</p>)}
+            {Profile.similarityScore && Profile.similarityScore > 0 && (<p className="text-complementary text-white absolute p-2 top-6 text-xs right-6 rounded-xl ml-auto bg-secondary">{Math.round(Profile?.similarityScore*100)}% Match</p>)}
         </Link>
     )
 }

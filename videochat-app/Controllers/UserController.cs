@@ -107,7 +107,7 @@ public class UserController : ControllerBase {
     public IActionResult GoogleLogin()
     {
         // return Challenge(new AuthenticationProperties { RedirectUri = "api/user/auth/google/callback" }, GoogleDefaults.AuthenticationScheme);
-        Console.WriteLine(nameof(GoogleCallback));
+        // Console.WriteLine(nameof(GoogleCallback));
         var redirectUrl = Url.Action(nameof(GoogleCallback), "User", new { returnUrl="http://localhost:3000/dashboard" }); // URL callback
         var properties = new    AuthenticationProperties() { 
             RedirectUri = redirectUrl,
@@ -119,6 +119,23 @@ public class UserController : ControllerBase {
         };
         properties.Items["state"] = Guid.NewGuid().ToString();
         return Challenge(properties,  "Google");
+    }
+    [HttpGet("github")]
+    public IActionResult GithubLogin()
+    {   
+        var state = Guid.NewGuid().ToString();
+        Console.WriteLine("Oauth state: "+state);
+        // Store the state in the cookie (with an expiration time)
+        // HttpContext.Session.SetString("OAuthState", state);  // Session is used here
+
+        var properties = new AuthenticationProperties
+        {
+            RedirectUri = Url.Action(nameof(GithubCallback), "User", null, Request.Scheme),
+            Items = { { "LoginProvider", "Github" }},
+        };
+        // Console.WriteLine("Properties: "+ properties.Items["state"]);
+        properties.Items["state"] = state;
+        return Challenge(properties,  "Github");
     }
     [HttpGet("google/callback")]
     
@@ -134,10 +151,34 @@ public class UserController : ControllerBase {
 
         // Retrieve the user ID stored during the OnCreatingTicket
         var userIdClaim = result.Principal.FindFirst("UserId");
-        Console.WriteLine("USer ID:"+ userIdClaim);
+        // Console.WriteLine("USer ID:"+ userIdClaim);
         var generatedToken = _jwtHelper.generateToken(userIdClaim.Value);
         CookieOptions cookieOptions = CookieHelper.GenerateCookie(4);
         Response.Cookies.Append("token",generatedToken, cookieOptions);
+        
+       
+        return Redirect("http://localhost:3000/dashboard");
+
+        // Generate a JWT token for the user
+        // return Ok(new { Token = token });
+    }
+    [HttpGet("github/callback")]
+    public async Task<IActionResult> GithubCallback()
+    {
+        Console.WriteLine("State: "+Request.Query["state"]);
+        var result = await HttpContext.AuthenticateAsync("Github");
+        if (!result.Succeeded)
+        {
+            Console.WriteLine("Something wrong with auth");
+            return Forbid(); // Handle failed authentication
+        }
+
+        // // Retrieve the user ID stored during the OnCreatingTicket
+        // var userIdClaim = result.Principal.FindFirst("UserId");
+        // // Console.WriteLine("USer ID:"+ userIdClaim);
+        // var generatedToken = _jwtHelper.generateToken(userIdClaim.Value);
+        // CookieOptions cookieOptions = CookieHelper.GenerateCookie(4);
+        // Response.Cookies.Append("token",generatedToken, cookieOptions);
         
        
         return Redirect("http://localhost:3000/dashboard");

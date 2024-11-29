@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Inter, Outfit,Rubik } from "next/font/google";
 
 import "./globals.css";
 import Navbar from "./components/main/Navbar";
+import { UserProvider } from "./providers/UserContext";
 
-const outfit = Outfit({ subsets: ["latin"] });
+const rubik = Rubik({ subsets: ["latin"] });
 
 
 export const metadata: Metadata = {
@@ -19,13 +20,15 @@ export default function RootLayout({
 }>) {
   return (
     <html>
-      <body className={outfit.className}>
-        <div className="flex max-h-screen">
-          <Navbar />
-          <main className="main-content w-full h-screen overflow-y-scroll">
-            {children}
-          </main>
-        </div>
+      <body className={rubik.className}>
+        {/* <UserProvider> */}
+          <div className="flex max-h-screen">
+            <Navbar />
+            <main className="main-content w-full h-screen overflow-y-scroll">
+              {children}
+            </main>
+          </div>
+      {/* </UserProvider> */}
 
       </body>
     </html>

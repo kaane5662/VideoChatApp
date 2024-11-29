@@ -7,6 +7,10 @@ import { IoExit } from "react-icons/io5";
 import { BiVolume, BiVolumeLow } from "react-icons/bi";
 import { BsCamera, BsCameraVideo, BsCameraVideoFill, BsCameraVideoOff, BsFillCameraVideoOffFill } from "react-icons/bs";
 import { LuScreenShare, LuScreenShareOff } from "react-icons/lu";
+import Chat from "@/app/components/video/Chat";
+import { IProfile, IVideoChat } from "@/app/interfaces";
+import InitDm from "@/app/components/messages/InitDm";
+import Intro from "@/app/components/video/Intro";
 
 export default function Peers(){
     // const {id} = useParams()
@@ -14,13 +18,16 @@ export default function Peers(){
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const streamRef = useRef<MediaStream | null>(null)
     const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
+    const [joinedSession, setJoinedSession] = useState(false)
+    const [ConnectedProfile, setConnectedProfile] = useState<IProfile | null>(null)
     const peerConnection= useRef<RTCPeerConnection | null>(null);
     
 
     const [muted, setMuted] = useState(false)
     const [videoToggled, setVideoToggled] = useState(false)
     const [screenShareToggled, setScreenShareToggled] = useState(false)
-    const joiningRoom = useRef(true)    
+    const joiningRoom = useRef(true)  
+    const [messages,setMessages] = useState<IVideoChat[]>([])
 
 
     const configuration = {
@@ -66,7 +73,14 @@ export default function Peers(){
         hubConnection.on('RoomJoined', async()=>{
             joiningRoom.current = false
             console.log("Matched with a user and joined room")
+            setMessages([])
+            setConnectedProfile(null)
             createOffer()
+        })
+
+        hubConnection.on('OnClientJoin', async(connection:string, profile:IProfile)=>{
+            console.log(profile)
+            setConnectedProfile(profile)
         })
   
         hubConnection.on('ReceiveOffer', async (fromConnectionId,offer) => {
@@ -126,8 +140,18 @@ export default function Peers(){
         hubConnection.on('LeftRoom', async(candidate)=>{
             streamRef.current = null
             peerConnection.current?.close()
+            streamRef.current = null
             joinRoom()
         })
+
+        hubConnection.on('onError',async(message,code)=>{
+            console.log(message)
+        })
+        hubConnection.on('messageRecieved',async(sender:string, message:string)=>{
+            console.log(sender)
+            setMessages((prevMessages) => [...prevMessages, {message:message, isSender:false}]);
+        })
+
 
         
   
@@ -145,25 +169,42 @@ export default function Peers(){
     };
 
     const toggleCamera = () => {
-        if (localVideoRef.current) {
-            const videoTracks = streamRef.current?.getVideoTracks();
-            videoTracks?.forEach(track => track.enabled = !track.enabled);
-            setVideoToggled(prev => !prev);
+        if (streamRef.current) {
+            const videoTrack = streamRef.current.getVideoTracks()[0];
+            if (videoTrack) {
+                videoTrack.enabled = !videoTrack.enabled;
+                if(!videoTrack.enabled) videoTrack.stop()
+                
+                setVideoToggled(videoTrack.enabled)
+            }
         }
     };
 
     const joinRoom = async () =>{
         if(!connection && !peerConnection /*&& !joinRoom*/) return;
-
+        setJoinedSession(true)
+        
+        
         console.log("Joining room")
         connection?.invoke("JoinPool")
+
     }
 
     const endSession = async ()=>{
         if(!connection && !peerConnection) return;
-        streamRef.current = null
+        
         peerConnection.current = null
-        connection?.stop()
+      
+        if(streamRef.current){
+            const videoTrack = streamRef.current
+            .getVideoTracks()
+            .find((track) => track.kind === "video");
+            
+            if (videoTrack) videoTrack.enabled = !videoTrack.enabled;
+            
+        }
+        setJoinedSession(false)
+        // connection?.stop()
     }
 
     const skipRoom = async () =>{
@@ -171,10 +212,21 @@ export default function Peers(){
         console.log("Skipping Room")
         streamRef.current = null
         peerConnection.current = null
+        setMessages([])
+        setConnectedProfile(null)
         await connection?.invoke("LeaveRoom").catch(err => console.error(err))
         await joinRoom()
         //recreate original sdp offer
         // await createOffer()
+    }
+
+    const sendMessage = async(text:string)=>{
+        if(!connection && !peerConnection) return;
+        console.log(text)
+        await connection?.invoke("SendMessage",text).then(()=>{
+            setMessages((prevMessages) => [...prevMessages, {message:text,isSender:true}]);
+            
+        })
     }
   
 
@@ -190,10 +242,19 @@ export default function Peers(){
         return()=>{connection?.stop()}
     },[])
 
+    if(!joinedSession){
+        return(
+            <Intro joinRoom={joinRoom}></Intro>
+        )
+    }
+    
+
     return(
-        <main className=" p-12 flex flex-col gap-2 h-screen bg-slate-50 text-secondary">
+        <main className=" p-12 flex gap-8 h-screen bg-slate-50 text-secondary">
             {/* <h1 className="text-sm font-semibold text-black">Room Id: <span className="text-opacity-50 text-black font-normal">{id}</span></h1> */}
-            <div className="gap-8 relative self-center h-[600px] w-[1000px]">
+            {ConnectedProfile ? (
+               
+            <div className="gap-8 relative self-center h-fit w-[1000px] rounded-sm">
                 <video className="h-[125px] absolute w-[200px] object-cover bg-white border-2 bg-opacity-20 right-4 top-4 border-opacity-35 border-white rounded-sm " ref={localVideoRef} autoPlay muted></video>
                 <video className="h-[600px] w-[1000px] object-cover bg-black rounded-sm" ref={remoteVideoRef} playsInline autoPlay></video>
                 
@@ -216,6 +277,10 @@ export default function Peers(){
                 </div>
                 
             </div>
+            ):(
+                <h1 className="w-full">Finding the perfect match for you...</h1>
+            )}
+            <Chat connectedProfile={ConnectedProfile} sendMessage={sendMessage} messages={messages}/>
             
 
 

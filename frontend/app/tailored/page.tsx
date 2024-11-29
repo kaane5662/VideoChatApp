@@ -40,7 +40,7 @@ export default function Tailored(){
                 <h1 className="font-bold text-4xl">Your AI-Powered Matches</h1>
                 <h3 className="text-opacity-50 text-xl text-black">Based on your profile, we’ve found these co-founders for you.</h3>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
                 {Profiles.map((profile, index)=>{
                     return(
                         <ProfileHeader key={index} Profile={profile}/>

@@ -165,6 +165,11 @@ export default function ProfileForm({ProfileData}:{ProfileData:IProfile}){
                     <label className="text-xl font-bold ">Bio</label>
                     <textarea onChange={(e)=>setProfile({...Profile,["description"]:e.target.value})} defaultValue={Profile?.description} name="description" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 h-[100px] "></textarea>
                 </div>
+                <div className="flex flex-col gap-4 col-span-2 bg-white p-6 rounded-md border-2">
+                    <label className="text-xl font-bold ">Frameworks</label>
+                    {<PaddedList items={Profile?.frameworks}></PaddedList>}
+                    <CheckboxDropdown checked={ProfileData?.frameworks} options={constants.frameworks} title="Choose your Frameworks" onSelectionChange={(e:any)=>changeDropdownField(e,"frameworks")}/>
+                </div>
                 <div className="flex flex-col gap-4 col-span- bg-white p-6 rounded-md border-2">
                     <label className="font-bold text-xl ">Languages</label>
                     {<PaddedList items={Profile?.programmingLanguages}></PaddedList>}

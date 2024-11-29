@@ -4,7 +4,9 @@ import { IProfile } from "../interfaces"
 export async function getProfile(id:string) {
     try{
         const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/profile/${id}`,{cache:"no-cache"})
-        return await res.json()
+        const data =  await res.json()
+        console.log(data)
+        return data
     }catch(error){
         console.log(error)
     }
@@ -50,6 +52,15 @@ export async function getMyProfile(cookie:string) {
         console.log(error)
     }
 }
+export async function getMyProfileClient() {
+    try{
+        
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/profile`,{withCredentials:true})
+        return res.data
+    }catch(error){
+        console.log(error)
+    }
+}
 
 export async function searchProfiles(searchParams:string) {
     try{
@@ -77,4 +88,5 @@ export async function updateProfile(profileData:IProfile) {
         console.log(error)
     }
 }
+
 

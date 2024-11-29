@@ -32,7 +32,7 @@ public class ProfileController : ControllerBase {
             if(IdentityUserId== null) return Forbid();
             Console.WriteLine("The user id: "+IdentityUserId);
             // Console.WriteLine("The profile:"+JsonConvert.SerializeObject(profileInput));
-            string serializedInput = JsonConvert.SerializeObject(profileInput);
+            // string serializedInput = JsonConvert.SerializeObject(profileInput);
             if(await _context.Profiles.AnyAsync(p=> p.IdentityUserId == IdentityUserId)) return BadRequest();
             var newProfile = await _context.Profiles.AddAsync(new Profile{
                 IdentityUserId = IdentityUserId,
@@ -54,7 +54,11 @@ public class ProfileController : ControllerBase {
                 TwitterUrl = profileInput.TwitterUrl,
             });
             await _context.SaveChangesAsync();
-            
+            ProfileDTO copy = new ProfileDTO(profileInput);
+            // var input = pro
+
+            string serializedInput = JsonConvert.SerializeObject(copy);
+            Console.WriteLine(serializedInput);
             OpenAI.Embeddings.Embedding embedding = await _ec.GenerateEmbeddingAsync(serializedInput);
             Console.WriteLine(embedding);
             await _pc.UpsertAsync(new UpsertRequest{
@@ -186,9 +190,10 @@ public class ProfileController : ControllerBase {
 
             _context.Profiles.Update(profile);
             await _context.SaveChangesAsync();
-            string serializedProfile = JsonConvert.SerializeObject(profile);
+            ProfileDTO copy = new ProfileDTO(profile);
+            string serializedProfile = JsonConvert.SerializeObject(copy);
+            Console.WriteLine(serializedProfile);
             OpenAI.Embeddings.Embedding embedding = await _ec.GenerateEmbeddingAsync(serializedProfile);
-            Console.WriteLine(embedding);
             await _pc.UpdateAsync(new UpdateRequest{
                     Id = IdentityUserId,
                     Values = embedding.Vector,   
@@ -199,6 +204,8 @@ public class ProfileController : ControllerBase {
             return BadRequest(err.Message);
         }
     }
+
+    
 
 
 }

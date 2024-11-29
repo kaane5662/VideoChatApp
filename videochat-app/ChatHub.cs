@@ -19,6 +19,7 @@ namespace SignalRChat {
         private readonly MyDBContext _context;
         private readonly ConnectedRoomsDictionary _connectedRooms;
         private readonly ConnectionsDictionary _connections;
+        private static readonly ConcurrentDictionary<int,string> _dmRooms = new ConcurrentDictionary<int,string>();
         private readonly ConcurrentQueue<UserTask> _userTasks= new ConcurrentQueue<UserTask>();
 
         
@@ -119,6 +120,62 @@ namespace SignalRChat {
             // await _context.SaveChangesAsync();
         }
 
+        public async Task SendMessage(string message){
+            _connectedRooms.TryGetValue(Context.ConnectionId, out var roomId);
+            if(roomId == null) return;
+            await Clients.OthersInGroup(roomId).SendAsync("MessageRecieved",Context.ConnectionId,message);
+        }
+
+        public async Task SendDirectMessage(int dmId, string text){
+            Console.WriteLine("Message: "+text);
+            string IdentityUserId = Context.GetHttpContext().Items["UserId"]?.ToString();
+            var profile = await _context.Profiles.FirstAsync(p=>p.IdentityUserId == IdentityUserId);
+            var validDm = await _context.DirectMessages.FirstOrDefaultAsync(dm => dm.Id == dmId && (dm.Profile1Id == profile.Id || dm.Profile2Id == profile.Id));
+            if(validDm == null) {
+                Console.WriteLine("Not valud");
+                return;
+            }
+            Console.WriteLine("Basic checks passed");
+            _dmRooms.TryGetValue(dmId,out var roomId);
+            Console.WriteLine("Room id"+roomId);
+            if (roomId == null) return;
+            await _context.Messages.AddAsync(new Message { DirectMessageId = dmId, Text =text, FromProfileId=profile.Id});
+            await _context.SaveChangesAsync();
+            await Clients.OthersInGroup(roomId).SendAsync("MessageRecieved",text);
+            Console.WriteLine(roomId);
+        }
+
+        public async Task TypingInDmThread(int dmId){
+            Console.WriteLine("Typing");
+            string IdentityUserId = Context.GetHttpContext().Items["UserId"]?.ToString();
+            var profile = await _context.Profiles.FirstAsync(p=>p.IdentityUserId == IdentityUserId);
+            var validDm = await _context.DirectMessages.FirstOrDefaultAsync(dm => dm.Id == dmId && (dm.Profile1Id == profile.Id || dm.Profile2Id == profile.Id));
+            _dmRooms.TryGetValue(dmId,out var roomId);
+            if(roomId == null)return;
+            await Clients.OthersInGroup(roomId).SendAsync("UserTyping",Context.ConnectionId,profile);
+            
+        }
+        public async Task JoinDmThread(int dmId){
+            Console.WriteLine("Joining dm "+dmId);
+            string IdentityUserId = Context.GetHttpContext().Items["UserId"]?.ToString();
+            var profile = await _context.Profiles.FirstAsync(p=>p.IdentityUserId == IdentityUserId);
+            var validDm = await _context.DirectMessages.FirstOrDefaultAsync(dm => dm.Id == dmId && (dm.Profile1Id == profile.Id || dm.Profile2Id == profile.Id));
+            if(validDm == null) return;
+            _dmRooms.TryGetValue(dmId,out var roomId);
+            if(roomId == null) {
+                Console.WriteLine("There is no room id");
+                _dmRooms.TryAdd(dmId,Guid.NewGuid().ToString());
+                Console.WriteLine(_dmRooms[dmId]);
+            }
+            Console.WriteLine("Room id"+roomId+" "+_dmRooms[dmId]);
+            await Groups.AddToGroupAsync(Context.ConnectionId,_dmRooms[dmId]);
+        }
+
+        
+        
+
+
+
         
 
 
@@ -159,7 +216,7 @@ namespace SignalRChat {
 
         public override async Task OnConnectedAsync()
         {
-            Console.WriteLine($"Connected: {Context.ConnectionId}");
+            // Console.WriteLine($"Connected: {Context.ConnectionId}");
             string IdentityUserId = Context.GetHttpContext().Items["UserId"]?.ToString();
             
             _connections[IdentityUserId] = Context.ConnectionId;
@@ -179,6 +236,7 @@ namespace SignalRChat {
                 await Clients.OthersInGroup(roomId).SendAsync("LeftRoom",Context.ConnectionId);
                 Groups.RemoveFromGroupAsync(Context.ConnectionId,roomId);
             }
+            
             // await _pcRooms.DeleteAsync(new DeleteRequest{
             //     Ids=new[] { Context.ConnectionId}
             // }); 

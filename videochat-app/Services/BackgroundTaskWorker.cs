@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using Helpers;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Pinecone;
 using SignalRChat;
 public class UserTask{
@@ -18,8 +19,9 @@ namespace Services {
         private readonly MyDBContext _context;
         private readonly ConnectedRoomsDictionary _connectedRooms;
         private readonly ConnectionsDictionary _connections;
+        private readonly IServiceProvider _serviceProvider;
 
-        public BackgroundTaskWorker(IHubContext<ChatHub> hubContext, ConcurrentQueue<UserTask> userQueue, IConfiguration configuration,  ConnectedRoomsDictionary connectedRooms, ConnectionsDictionary connections)
+        public BackgroundTaskWorker(IHubContext<ChatHub> hubContext, ConcurrentQueue<UserTask> userQueue, IConfiguration configuration,  ConnectedRoomsDictionary connectedRooms, ConnectionsDictionary connections, IServiceProvider serviceProvider)
         {
             _hubContext = hubContext;
             _userTasks = userQueue;
@@ -28,17 +30,18 @@ namespace Services {
             PineconeClient pc = new PineconeClient(configuration["Pinecone:ApiKey"]);
             _pcRooms = pc.Index("chatroom");
             _pcProfiles = pc.Index("profiles");
-            // _context = context;
+            _serviceProvider = serviceProvider;
+           
         }
 
-        private async Task<bool> matchedUser(UserTask user){
+        private async Task<bool> matchedUser(UserTask user, MyDBContext _context){
             
             if(_connectedRooms.ContainsKey(user.ConnectionId)) return true;
             FetchResponse profile = await _pcProfiles.FetchAsync(new FetchRequest{
                 Ids=new[] { (string) user.IdentityUserId},
             });
+            var profileData = _context.Profiles.First(p=>p.IdentityUserId==user.IdentityUserId);
             float[] profileVector = profile.Vectors.First().Value.Values.ToArray();
-
             //get matching profile vectors
             QueryResponse similarProfiles = await _pcProfiles.QueryAsync(new QueryRequest{
                 Vector=profileVector,
@@ -81,6 +84,9 @@ namespace Services {
                     }
                 });
                 await _hubContext.Clients.Group(newRoomId).SendAsync("RoomJoined");
+                var otherProfileData = await _context.Profiles.FirstAsync(p => p.IdentityUserId == similarProfile.Id);
+                await _hubContext.Clients.Client(user.ConnectionId).SendAsync("OnClientJoin", _connections[similarProfile.Id], otherProfileData);
+                await _hubContext.Clients.Client( _connections[similarProfile.Id]).SendAsync("OnClientJoin", user.ConnectionId, profileData);
                 return true;
             }
 
@@ -91,15 +97,22 @@ namespace Services {
         {
             Console.WriteLine("Starting the background task");
             while(!stoppingToken.IsCancellationRequested){
-                await Task.Delay(500);
-                if(_userTasks.IsEmpty) continue;
-                _userTasks.TryDequeue(out var current);
-                if(current.Retires == 0) continue;
-                current.Retires -=1;
-                Console.WriteLine("Matching user");
-                if(await matchedUser(current)) continue;
-                Console.WriteLine("Failed to match user");
-                _userTasks.Enqueue(current);
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var dbContext = scope.ServiceProvider.GetRequiredService<MyDBContext>();
+                    await Task.Delay(500);
+                    if(_userTasks.IsEmpty) continue;
+                    _userTasks.TryDequeue(out var current);
+                    if(current.Retires <= 0) {
+                        await _hubContext.Clients.Client(current.ConnectionId).SendAsync("onError","Failed to join room",400);
+                        continue;   
+                    }
+                    current.Retires -=1;
+                    Console.WriteLine("Matching user");
+                    if(await matchedUser(current,dbContext)) continue;
+                    Console.WriteLine("Failed to match user");
+                    _userTasks.Enqueue(current);
+                }
                 
             }
         }

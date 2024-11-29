@@ -13,7 +13,7 @@ export default async function Dashboard(){
     const ReccomendedProfiles:IProfile[] = await getSimilarProfiles2(cookies().toString());
     
     return(
-        <main className=" bg-slate-50 text-secondary h-screen p-12 gap-8 flex flex-col overflow-y-scroll">
+        <main className=" bg-slate-50 text-secondary h-screen p-12 gap-8 flex flex-col ">
             {/* <Navbar></Navbar> */}
             <div className="flex flex-col gap-2">
                 <h1 className="font-bold text-4xl ">Hi, {Profile?.firstName}</h1>
