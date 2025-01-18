@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Outfit,Rubik } from "next/font/google";
+import { Inter, Outfit,Rubik,Jost,Space_Grotesk } from "next/font/google";
 
 import "./globals.css";
 import Navbar from "./components/main/Navbar";
 import { UserProvider } from "./providers/UserContext";
 
-const rubik = Rubik({ subsets: ["latin"] });
+const space_grotesk = Space_Grotesk({ subsets: ["latin"] });
 
 
 export const metadata: Metadata = {
@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html>
-      <body className={rubik.className}>
+      <body className={space_grotesk.className}>
         {/* <UserProvider> */}
           <div className="flex max-h-screen">
             <Navbar />

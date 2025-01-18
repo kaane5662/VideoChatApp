@@ -1,10 +1,10 @@
 "use client"
 import { useEffect, useState } from "react";
-import SimilarStep from "../components/profiles/SimilarStep";
-import { getSimilarProfiles } from "../services/profiles";
-import { IProfile } from "../interfaces";
-import ProfileBanner from "../components/profiles/ProfileBanner";
-import ProfileHeader from "../components/profiles/ProfileHeader";
+import SimilarStep from "../../components/profiles/SimilarStep";
+import { getSimilarProfiles } from "../../services/profiles";
+import { IProfile } from "../../interfaces";
+import ProfileBanner from "../../components/profiles/ProfileBanner";
+import ProfileHeader from "../../components/profiles/ProfileHeader";
 
 export default function Tailored(){
     const [Profiles,setProfiles]  = useState<IProfile[]>([])

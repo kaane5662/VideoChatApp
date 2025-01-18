@@ -57,7 +57,6 @@ C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\Pinecone.d
 C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\System.ClientModel.dll
 C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
 C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\System.Memory.Data.dll
-C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\System.Text.Json.dll
 C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\Humanizer.dll
 C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll

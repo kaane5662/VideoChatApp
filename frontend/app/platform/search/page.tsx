@@ -1,11 +1,11 @@
 "use client"
 import { useEffect, useState } from "react";
-import ProfileSearchBar from "../components/profiles/ProfileSearchBar";
-import { IProfile, IProfileSearch } from "../interfaces";
-import { createSearchParams } from "../helpers/createSearchParams";
+import ProfileSearchBar from "../../components/profiles/ProfileSearchBar";
+import { IProfile, IProfileSearch } from "../../interfaces";
+import { createSearchParams } from "../../helpers/createSearchParams";
 import axios from "axios";
-import { searchProfiles } from "../services/profiles";
-import ProfileHeader from "../components/profiles/ProfileHeader";
+import { searchProfiles } from "../../services/profiles";
+import ProfileHeader from "../../components/profiles/ProfileHeader";
 
 export default function Search(){
     const [Profiles, setProfiles] = useState<IProfile | any>([])

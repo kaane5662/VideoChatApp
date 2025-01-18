@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
-import ProfileForm from "../components/profiles/ProfileForm";
-import { IProfile } from "../interfaces";
-import { getMyProfile } from "../services/profiles";
+import ProfileForm from "../../components/profiles/ProfileForm";
+import { IProfile } from "../../interfaces";
+import { getMyProfile } from "../../services/profiles";
 
 
 export default async function ProfilePage(){

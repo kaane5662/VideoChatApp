@@ -1,10 +1,10 @@
 
 import { useState } from "react"
-import { getDirectMessages } from "../services/messages"
+import { getDirectMessages } from "../../services/messages"
 import { cookies } from "next/headers"
 import { notFound } from "next/navigation"
-import { IDirectMessage } from "../interfaces"
-import Contact from "../components/messages/Contact"
+import { IDirectMessage } from "../../interfaces"
+import Contact from "../../components/messages/Contact"
 
 export default async function MessagesPage(){
     // const DirectMessages:IDirectMessage[] = await getDirectMessages(cookies().toString())

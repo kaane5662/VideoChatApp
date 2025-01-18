@@ -14,7 +14,7 @@ export default async function Similar({id}:IProfile){
                     return(
                         <div className="flex flex-col gap-4">
                             <div className="flex flex-col gap-2">
-                                <img className="w-30 h-30 bg-blue-800"></img>
+                                <img className="w-30 h-30 bg-secondary text-complementary"></img>
                                 <h1>{similarProfile.username}</h1>
                                 <h3>{similarProfile.industry} | {similarProfile.currentRole}</h3>   
                             </div>
