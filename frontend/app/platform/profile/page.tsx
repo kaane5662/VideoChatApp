@@ -10,7 +10,7 @@ export default async function ProfilePage(){
     
     
     return(
-        <main className="min-h-screen justify-center items-center flex p-12 bg-slate-50 overflow-y-scroll">
+        <main className="min-h-screen justify-center items-center flex p-12  overflow-y-scroll">
             
             <ProfileForm ProfileData={Profile}></ProfileForm>
         </main>

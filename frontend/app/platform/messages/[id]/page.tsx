@@ -1,6 +1,6 @@
 "use client"
 import { IMessage, IProfile } from "@/app/interfaces";
-import { getDirectMessagesThread } from "@/app/services/messages";
+import { getDirectMessagesThread, getMessagesInThread } from "@/app/services/messages";
 import { useEffect, useRef, useState } from "react";
 import { IoSend } from "react-icons/io5";
 import * as signalR from '@microsoft/signalr';
@@ -17,6 +17,7 @@ export default function MessageThread({params}:any){
     const [connection,setConnection] = useState<signalR.HubConnection>()
     const [Typers,setTypers] = useState<IProfile[]>([])
     const hasConnection = useRef(false)
+    const [earliest,setEarliest] = useState(new Date())
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const [text,setText] = useState("")
     // const {user,setUser}= useUser()
@@ -24,12 +25,25 @@ export default function MessageThread({params}:any){
         try{
            var data = await getDirectMessagesThread(id)
            console.log(data)
-           setMessages(data.messages)
-           setOtherProfile(data.otherProfile)
+           setOtherProfile(data)
         }catch(error){
             console.log(error)
         }
     }
+    const getThreadMessages = async ()=>{
+        try{
+           var data = await getMessagesInThread(id,earliest)
+           console.log(data)
+           if(!data?.error && data.length > 0){
+                setEarliest( new Date(data[data.length-1].createdAt))
+           }
+           setMessages(prev=>[...data.toReversed(),...prev])
+        }catch(error){
+            console.log(error)
+        }
+    }
+
+    
     const initLiveChat = async ()=>{
         if(hasConnection.current == true) return
         console.log("Creating live chat")
@@ -91,8 +105,11 @@ export default function MessageThread({params}:any){
         console.log(data)
         setMyProfile(data)
     }
+
     useEffect(()=>{
-        getCurrentUser().then(getMessagesThread)
+        getMessagesThread()
+        getCurrentUser()
+        getThreadMessages()
         // getMessagesThread()
     },[])
 
@@ -100,7 +117,9 @@ export default function MessageThread({params}:any){
         // Scroll to the bottom if messages change
         if (messagesEndRef.current) {
             const container = messagesEndRef.current;
-            container.scrollTop = container.scrollHeight;
+            console.log(container.scrollTop, container.scrollHeight)
+            if(container.scrollTop -400 >= container.scrollHeight )
+                container.scrollTop = container.scrollHeight;
         }
       }, [Messages]);
 
@@ -131,6 +150,7 @@ export default function MessageThread({params}:any){
                 </div>
             </div>
             <div ref={messagesEndRef} className=" overflow-y-scroll flex flex-col h-full p-10 gap-4 items-center ">
+                <button onClick={getThreadMessages} className="text-sm rounded-xl px-4 p-2 bg-secondary text-complementary">Load More</button>
                 {MyProfile && Messages?.map((message:IMessage,index:number)=>{
                     return(
                         <div key={index} className={`flex flex-col gap-1 w-[50%] ${message.fromProfileId == MyProfile.id ? "ml-auto":" "}`}>
@@ -152,8 +172,8 @@ export default function MessageThread({params}:any){
                 ) }
                 
                 <div className=" flex gap-2">
-                    <input onFocus={startTyping } value={text} onChange={(e)=>setText(e.target.value)} name="text" placeholder="Send a message..." className="border-2 p-2 text-sm w-full h-50 rounded-sm"></input>
-                    <button><IoSend size={35} className="bg-secondary text-white p-2 rounded-full"></IoSend></button>
+                    <input onFocus={startTyping } value={text} onChange={(e)=>setText(e.target.value)} name="text" placeholder="Send a message..." className="border-2 p-2 text-sm w-full h-50 rounded-sm shadow-md rounded-xl"></input>
+                    <button><IoSend size={35} className="bg-secondary text-white shadow-md p-2 rounded-full"></IoSend></button>
 
                 </div>
                 

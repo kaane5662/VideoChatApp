@@ -37,7 +37,7 @@ public class ProfileController : ControllerBase {
             var newProfile = await _context.Profiles.AddAsync(new Profile{
                 IdentityUserId = IdentityUserId,
                 ProgrammingLanguages = profileInput.ProgrammingLanguages,
-                Frameworks = ["test"],
+                Frameworks = profileInput.Frameworks,
                 CurrentRole = profileInput.CurrentRole,
                 // DatabasesUsed = profileInput.DatabasesUsed,
                 Certifications = profileInput.Certifications,
@@ -105,6 +105,38 @@ public class ProfileController : ControllerBase {
         }
     }
 
+    [HttpGet("similar/{id}")]
+    [Authorize]
+    public async Task<IActionResult> GetSimilarProfilesById(int id){
+        
+        try{
+            Console.WriteLine(id);
+            Profile otherProfile = await _context.Profiles.FirstAsync(p=>p.Id == id);
+
+            FetchResponse profile = await _pc.FetchAsync(new FetchRequest{
+                Ids=new[] { (string) otherProfile.IdentityUserId},
+            });
+            float[] profileVector = profile.Vectors.First().Value.Values.ToArray();
+            QueryResponse matchingIds = await _pc.QueryAsync(new QueryRequest{
+                Vector= profileVector,
+                TopK=4,
+                IncludeValues=true
+            });
+            // Console.WriteLine(matchingIds);
+            var matchingProfiles = new List<Profile>();
+            foreach(var matchingId in matchingIds.Matches.ToList()){
+                var matchingProfile = await _context.Profiles.FirstAsync(p=>p.IdentityUserId == matchingId.Id);
+                matchingProfile.SimilarityScore = matchingId.Score.Value;
+                matchingProfiles.Add(matchingProfile);
+            }
+            Console.WriteLine(matchingProfiles.ToArray().ToString());
+            return Ok(matchingProfiles);
+            
+        }catch(Exception err){
+            Console.WriteLine(err.Message);
+            return BadRequest(err.Message);
+        }
+    }
     [HttpGet("similar/")]
     [Authorize]
     public async Task<IActionResult> GetSimilarProfiles(){
@@ -116,9 +148,10 @@ public class ProfileController : ControllerBase {
             float[] profileVector = profile.Vectors.First().Value.Values.ToArray();
             QueryResponse matchingIds = await _pc.QueryAsync(new QueryRequest{
                 Vector= profileVector,
-                TopK=15,
+                TopK=25,
                 IncludeValues=true
             });
+            
             // Console.WriteLine(matchingIds);
             var matchingProfiles = new List<Profile>();
             foreach(var matchingId in matchingIds.Matches.ToList()){
@@ -135,7 +168,7 @@ public class ProfileController : ControllerBase {
     }
 
     [HttpGet("search")]
-    public async Task<IActionResult> SearchProfiles([FromQuery] string[] avaliability, [FromQuery] string[] industry, [FromQuery] string[] languages, [FromQuery] string[] interests){
+    public async Task<IActionResult> SearchProfiles([FromQuery] string[] avaliability, [FromQuery] string[] industry, [FromQuery] string[] languages, [FromQuery] string[] interests, [FromQuery] string[] currentRole,[FromQuery] int page){
         
         try{
             var query = _context.Profiles.AsQueryable();
@@ -151,10 +184,14 @@ public class ProfileController : ControllerBase {
             
             if (interests != null && interests.Length > 0)
                 query = query.Where(p => interests.Any(inter => p.DevelopmentInterests.Contains(inter)));
+
+            if (currentRole != null && currentRole.Length > 0)
+                query = query.Where(p => currentRole.Any(cr => p.CurrentRole.Contains(cr)));
             
+            var count = await query.CountAsync();
+            var paginatedResults = await query.OrderBy(p=>p.Id).Skip((page-1)*3).Take(3).ToListAsync();
             
-            var results = await query.ToListAsync();
-            return Ok(results);
+            return Ok(new{paginatedResults,count=Math.Ceiling( (double)count/3)});
             
         }catch(Exception err){
             return BadRequest(err.Message);

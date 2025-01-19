@@ -16,15 +16,16 @@ namespace Helpers{
             if (res == null) return null;
             return res;
         }
-        public async Task createUser(string email, string password){
+        public async Task<User> createUser(string email, string password){
             Console.WriteLine("Creating the user");
             var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(password));
             var passwordHash = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(password)));
-            _context.Users.Add(new User{
+            var newUser = _context.Users.Add(new User{
                 Email = email,
                 PasswordHash = passwordHash
             });
             await _context.SaveChangesAsync();
+            return newUser.Entity;
         }
         public async Task<bool> signInUser(string email, string password){
             var res = await _context.Users.AddAsync(new User{

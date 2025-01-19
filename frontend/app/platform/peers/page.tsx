@@ -23,7 +23,7 @@ export default function Peers(){
     const peerConnection= useRef<RTCPeerConnection | null>(null);
     
 
-    const [muted, setMuted] = useState(false)
+    const [muted, setMuted] = useState(true)
     const [videoToggled, setVideoToggled] = useState(false)
     const [screenShareToggled, setScreenShareToggled] = useState(false)
     const joiningRoom = useRef(true)  
@@ -39,17 +39,18 @@ export default function Peers(){
         console.log("Creating offer")
         streamRef.current = null
         
-
+        console.log(videoToggled,muted)
         const pc = new RTCPeerConnection(configuration)
         peerConnection.current = pc
-        let stream;
+        let stream:MediaStream;
         // if(muted && !videoToggled && !screenShareToggled) {peerConnection.current.close()}   
         // if(screenShareToggled){
         //     stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: !muted })
         // }else{
         //     stream = await navigator.mediaDevices.getUserMedia({ video: videoToggled, audio: !muted })
         // }
-        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        if(!videoToggled && muted) return
+        stream = await navigator.mediaDevices.getUserMedia({ video: videoToggled, audio: !muted })
         
         // streamRef.current = stream
         if (localVideoRef.current) {
@@ -132,7 +133,7 @@ export default function Peers(){
             if (!peerConnection.current) return
             console.log("Recived ICE candidate" );
             console.log(candidate)
-            // console.log(candidate)
+            console.log(candidate)
             await peerConnection.current.addIceCandidate(new RTCIceCandidate(JSON.parse(candidate)));
           
         });
@@ -141,11 +142,12 @@ export default function Peers(){
             streamRef.current = null
             peerConnection.current?.close()
             streamRef.current = null
+            console.log("left room")
             joinRoom()
         })
 
         hubConnection.on('onError',async(message,code)=>{
-            console.log(message)
+            console.log(message, code)
         })
         hubConnection.on('messageRecieved',async(sender:string, message:string)=>{
             console.log(sender)
@@ -169,19 +171,22 @@ export default function Peers(){
     };
 
     const toggleCamera = () => {
+        console.log("on camera change")
         if (streamRef.current) {
             const videoTrack = streamRef.current.getVideoTracks()[0];
             if (videoTrack) {
+                // Toggle the enabled state
                 videoTrack.enabled = !videoTrack.enabled;
-                if(!videoTrack.enabled) videoTrack.stop()
-                
-                setVideoToggled(videoTrack.enabled)
+
+                console.log(`Video track is now ${videoTrack.enabled ? "enabled" : "disabled"}`);
             }
+            
         }
+        setVideoToggled(!videoToggled)
     };
 
     const joinRoom = async () =>{
-        if(!connection && !peerConnection /*&& !joinRoom*/) return;
+        if(!connection) return;
         setJoinedSession(true)
         
         
@@ -216,8 +221,6 @@ export default function Peers(){
         setConnectedProfile(null)
         await connection?.invoke("LeaveRoom").catch(err => console.error(err))
         await joinRoom()
-        //recreate original sdp offer
-        // await createOffer()
     }
 
     const sendMessage = async(text:string)=>{
@@ -234,7 +237,7 @@ export default function Peers(){
     useEffect(()=>{
         if(!connection) return
         createOffer()
-    },[/*muted, videoToggled,*/ screenShareToggled])
+    },[muted,videoToggled])
     
     useEffect(()=>{
         console.log("Initialized")
@@ -255,8 +258,8 @@ export default function Peers(){
             {ConnectedProfile ? (
                
             <div className="gap-8 relative self-center h-fit w-[1000px] rounded-sm">
-                <video className="h-[125px] absolute w-[200px] object-cover bg-white border-2 bg-opacity-20 right-4 top-4 border-opacity-35 border-white rounded-sm " ref={localVideoRef} autoPlay muted></video>
-                <video className="h-[600px] w-[1000px] object-cover bg-black rounded-sm" ref={remoteVideoRef} playsInline autoPlay></video>
+                <video className="h-[125px] absolute w-[200px] object-cover bg-white border-2 bg-opacity-20 right-0 top-0 border-opacity-35 border-white rounded-xl " ref={localVideoRef} autoPlay muted></video>
+                <video className="h-[600px] w-[1000px] object-cover bg-black rounded-xl" ref={remoteVideoRef} playsInline autoPlay></video>
                 
                 <div className="p-2 px-12 bg-opacity-40 absolute mx-auto bottom-10 right-0 left-0  rounded-sm flex gap-4 w-fit self-center text-white">
                     <button onClick={toggleMute}>

@@ -8,13 +8,15 @@ export default function Chat({messages,sendMessage, connectedProfile}:{messages:
     const [text,setText] = useState("")
     const router = useRouter();
     return(
-        <div className="flex flex-col bg-white gap-8 p-4 relative w-[30%] justify-between shadow-md ">
+        <div className="flex flex-col bg-white gap-8 p-4 relative w-[30%] justify-between shadow-md rounded-xl ">
             <h1 className="font-bold text-xl">Live Chat</h1>
             <div className="flex flex-col gap-3 h-full overflow-y-scroll">
                 {connectedProfile && (
-                    <div className="">
-                        <h1 className="font-bold"><span onClick={()=>router.push(`/profiles/${connectedProfile.id}`)} className=" text-complementary underline hover:cursor-pointer">{connectedProfile?.firstName}</span> has joined</h1>
-                        <p className="text-sm text-opacity-50 text-secondary">{connectedProfile?.industry}</p>
+                    <div className="flex gap-4 flex-col">
+                        <div className="flex flex-col gap-0">
+                            <h1 className="font-bold text-opacity-50"><span onClick={()=>router.push(`/platform/profiles/${connectedProfile.id}`)} className=" text-secondary underline hover:cursor-pointer">{connectedProfile?.firstName}</span> has joined</h1>
+                            <p className="text-sm text-opacity-50 text-secondary">{connectedProfile?.industry}</p>
+                        </div>
                         <PaddedList items={connectedProfile?.frameworks}></PaddedList>
                     </div>
 
@@ -31,7 +33,7 @@ export default function Chat({messages,sendMessage, connectedProfile}:{messages:
                 
             </div>
             <div className=" bottom-0 w-full flex gap-4   ">
-                <textarea placeholder="Enter message..." onChange={(e)=>setText(e.target.value)} className="p-2 text-sm w-full h-50 bg-slate-50 overflow-y-auto border-2 rounded-sm "></textarea>
+                <textarea placeholder="Enter message..." onChange={(e)=>setText(e.target.value)} className="p-2 text-sm w-full h-50 bg-slate-50 overflow-y-auto border-2 rounded-xl "></textarea>
                 <IoSend onClick={()=>sendMessage(text)} className="text-white h-10 w-10 bg-secondary p-2 w-[15%] rounded-full hover:cursor-pointer"></IoSend>
             </div>
         </div>

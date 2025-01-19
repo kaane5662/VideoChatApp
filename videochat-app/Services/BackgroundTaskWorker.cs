@@ -45,7 +45,7 @@ namespace Services {
             //get matching profile vectors
             QueryResponse similarProfiles = await _pcProfiles.QueryAsync(new QueryRequest{
                 Vector=profileVector,
-                TopK=7,
+                TopK=10,
                 IncludeValues=true,
                 Filter = new Pinecone.Metadata{
                     ["status"] = new Pinecone.Metadata{
@@ -104,7 +104,7 @@ namespace Services {
                     if(_userTasks.IsEmpty) continue;
                     _userTasks.TryDequeue(out var current);
                     if(current.Retires <= 0) {
-                        await _hubContext.Clients.Client(current.ConnectionId).SendAsync("onError","Failed to join room",400);
+                        await _hubContext.Clients.Client(current.ConnectionId).SendAsync("onError","Failed to join room",405);
                         continue;   
                     }
                     current.Retires -=1;

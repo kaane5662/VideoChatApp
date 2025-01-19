@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import { Inter, Outfit,Rubik,Jost,Space_Grotesk } from "next/font/google";
+import { Inter, Outfit,Rubik,Jost,Space_Grotesk, Ubuntu,DM_Sans } from "next/font/google";
 
 import "./globals.css";
-import Navbar from "./components/main/Navbar";
 import { UserProvider } from "./providers/UserContext";
 
-const space_grotesk = Space_Grotesk({ subsets: ["latin"] });
+const dm_sans = DM_Sans({ subsets: ["latin"] });
 
 
 export const metadata: Metadata = {
@@ -20,14 +19,9 @@ export default function RootLayout({
 }>) {
   return (
     <html>
-      <body className={space_grotesk.className}>
+      <body className={` bg-complementary text-secondary ${dm_sans.className}`}>
         {/* <UserProvider> */}
-          <div className="flex max-h-screen">
-            <Navbar />
-            <main className="main-content w-full h-screen overflow-y-scroll">
-              {children}
-            </main>
-          </div>
+          {children}
       {/* </UserProvider> */}
 
       </body>

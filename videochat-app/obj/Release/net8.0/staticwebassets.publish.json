@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "E8PDOrv4mt30UW5/LgVjYsR4CurFj2mOWhOdBaTOTDs=",
+  "Source": "videochat-app",
+  "BasePath": "_content/videochat-app",
+  "Mode": "Default",
+  "ManifestType": "Publish",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

@@ -28,3 +28,12 @@ export async function getDirectMessagesThread(id:number) {
         console.log(error)
     }
 }
+export async function getMessagesInThread(id:number, date:Date) {
+    try{
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/messages/thread/${id}?date=${date.toISOString()}`,{withCredentials:true})
+        console.log(res.data)
+        return res.data
+    }catch(error){
+        console.log(error)
+    }
+}

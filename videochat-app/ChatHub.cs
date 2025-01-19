@@ -49,7 +49,7 @@ namespace SignalRChat {
             //get matching profile vectors
             QueryResponse similarProfiles = await _pcProfiles.QueryAsync(new QueryRequest{
                 Vector=profileVector,
-                TopK=7,
+                TopK=10,
                 IncludeValues=true,
                 Filter = new Pinecone.Metadata{
                     ["status"] = new Pinecone.Metadata{
@@ -110,14 +110,7 @@ namespace SignalRChat {
                 }
             });
             _userTasks.Enqueue(new UserTask{ConnectionId=Context.ConnectionId, IdentityUserId=IdentityUserId});
-            // if(!backgroundTaskRunning) StartWorkers(1);
-            // _connections[IdentityUserId] = Context.ConnectionId;
-
-
-            // var profileDoc = await _context.Profiles.FirstAsync(p=> p.IdentityUserId == IdentityUserId);
-            // profileDoc.Sessions +=1;
-            // _context.Profiles.Update(profileDoc);
-            // await _context.SaveChangesAsync();
+           
         }
 
         public async Task SendMessage(string message){

@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function ProfileHeader({Profile}:{Profile:IProfile}){
     return(
-        <Link href={`/profile/${Profile?.id}`} className="rounded-sm border-secondary bg-white border-opacity-20 p-8 flex gap-2 hover:shadow-xl duration-300 hover:scale-105 flex-col relative border-2 shadow-md ">
+        <Link href={`/platform/profile/${Profile?.id}`} className="rounded-xl border-secondary bg-white border-opacity-20 p-8 flex gap-2 hover:shadow-xl duration-300 hover:scale-105 flex-col relative border-2 shadow-xl ">
             <div className="flex gap-4 items-center">
                 <div className="w-fit h-fit relative">
                     <img className="h-16 w-16    bg-secondary rounded-full">
@@ -19,11 +19,8 @@ export default function ProfileHeader({Profile}:{Profile:IProfile}){
                 
                 
             </div>
-            {/* <h3 className="text-sm text-secondary text-opacity-50">Interests</h3>
-            <PaddedList items={Profile.developmentInterests}/>
-            <h3 className="text-sm text-secondary text-opacity-50">Languages</h3>
-            <PaddedList items={Profile.programmingLanguages}/> */}
-            <div className="flex flex-col justify-between gap-4">
+            
+            <div className="flex flex-col justify-between gap-4 border-top-2">
                         <p className="text-sm text-secondary text-opacity-50">{Profile.industry}</p>
                         <div className="w-[80%]">
                         <PaddedList items={Profile.frameworks}/>

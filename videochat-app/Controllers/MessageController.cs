@@ -28,6 +28,7 @@ public class MessagesController : ControllerBase {
     [HttpGet("")]
    
     public async Task<IActionResult> GetDirectMessages() {
+        
         try{
             string IdentityUserId = HttpContext.Items["UserId"]?.ToString();
             Console.WriteLine("Im getting the direct messages");
@@ -87,7 +88,37 @@ public class MessagesController : ControllerBase {
                 }
             ).ToListAsync();
             var profileOther = await _context.Profiles.FirstOrDefaultAsync(p=> p.Id == (profile.Id == validDm.Profile1Id ? validDm.Profile2Id:validDm.Profile1Id) ) ;
-            return Ok(new{messages=messages, otherProfile=profileOther});
+            return Ok(profileOther);
+        }catch(Exception err){
+            Console.WriteLine(err.ToString());
+            return BadRequest(err.Message);
+        }
+    }
+    [HttpGet("thread/{id}")]
+    public async Task<IActionResult> GetMessagesInThread(int id, [FromQuery] DateTime date) {
+        try{
+            Console.WriteLine("Hello from get mesages in thread");
+            string IdentityUserId = HttpContext.Items["UserId"]?.ToString();
+            var profile = await _context.Profiles.FirstAsync(p=>p.IdentityUserId == IdentityUserId);
+            var validDm = await _context.DirectMessages.FirstOrDefaultAsync(dm=> dm.Id == id && (dm.Profile1Id == profile.Id || dm.Profile2Id == profile.Id));
+            if(validDm == null) return Forbid();
+            var messages =  await (
+                from m in _context.Messages
+                join p in _context.Profiles
+                on m.FromProfileId equals p.Id
+                where m.DirectMessageId == id && m.CreatedAt < date
+                orderby m.CreatedAt descending
+                
+                select new {
+                    Text = m.Text,
+                    CreatedAt = m.CreatedAt,
+                    FirstName = p.FirstName,
+                    FromProfileId=m.FromProfileId
+                }
+            ).Take(10).ToListAsync();
+            // messages = messages.OrderByDescending(m => m.CreatedAt).ToList();
+            Console.WriteLine(messages);
+            return Ok(messages);
         }catch(Exception err){
             Console.WriteLine(err.ToString());
             return BadRequest(err.Message);

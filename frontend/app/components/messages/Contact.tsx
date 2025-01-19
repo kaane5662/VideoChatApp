@@ -6,7 +6,7 @@ export default function Contact({directMessage}:{directMessage:IDirectMessage}){
     const router = useRouter()
     return(
 
-    <div onClick={()=>router.push(`/messages/${directMessage.roomId}`)} className="flex gap-4 hover:bg-opacity-10 hover:cursor-pointer duration-300 hover:bg-secondary ">
+    <div onClick={()=>router.push(`/platform/messages/${directMessage.roomId}`)} className="flex gap-4 hover:bg-opacity-10 hover:cursor-pointer duration-300 hover:bg-secondary bg-white">
         <img className="h-14 w-14 rounded-full bg-secondary self-center"></img>
         <div className="flex  border-y p-4 w-full">
             

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { FaCaretDown, FaPlus } from 'react-icons/fa';
 
-const CheckboxDropdown = ({ options, onSelectionChange,title,checked }:{options:string[], onSelectionChange:Function,title:string,checked:string[]| null}) => {
+const CheckboxDropdown = ({ options, onSelectionChange,title,checked }:{options:string[], onSelectionChange:Function,title:string,checked?:string[]| null}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<string[]>(checked || []);
 

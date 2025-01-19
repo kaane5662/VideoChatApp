@@ -16,7 +16,7 @@ const config: Config = {
       colors:{
         primary: "#141414",
         secondary: "#001549",
-        complementary: "#f5f5f5"
+        complementary: "#f8f8f8"
       }
     },
   },

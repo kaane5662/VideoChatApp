@@ -14,7 +14,7 @@ export default function InitDm({profileId}:{profileId:number}){
         setLoading(true)
         try{
             var newRoomId:IDirectMessage = await createDirectMessageThread(profileId)
-            router.push(`/messages/${newRoomId  }`)
+            router.push(`/platform/messages/${newRoomId  }`)
         }catch(err:any){
             console.log(err.message)
         }

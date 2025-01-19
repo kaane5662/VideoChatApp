@@ -23,7 +23,7 @@ export default function Tailored(){
     },[])
     //convert to server component
     return(
-        <main className=" bg-slate-100 min-h-screen p-12 gap-8 flex flex-col ">
+        <main className="  min-h-screen p-12 gap-8 flex flex-col ">
             {/* for landing page */}
             {/* <div className="flex flex-col gap-2  p-12 rounded-xl ">
                 <h1 className="font-bold text-6xl w-[50%]">Discover Co-Founders Like You!</h1>
@@ -37,8 +37,8 @@ export default function Tailored(){
                 <button className="bg-blue-800 p-4 mt-8 px-8 text-white w-fit rounded-xl">Find Similar Profiles</button>
             </div> */}
             <div className="flex flex-col gap-2">
-                <h1 className="font-bold text-4xl">Your AI-Powered Matches</h1>
-                <h3 className="text-opacity-50 text-xl text-black">Based on your profile, we’ve found these co-founders for you.</h3>
+                <h1 className="font-bold text-3xl">Your AI-Powered Matches</h1>
+                <h3 className="text-opacity-50 text-md text-black">Based on your profile, we’ve found these co-founders for you.</h3>
             </div>
             <div className="grid grid-cols-3 gap-4">
                 {Profiles.map((profile, index)=>{

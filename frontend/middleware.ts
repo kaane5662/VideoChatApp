@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export function middleware(request: NextRequest) {
   // Define the cookie name you're checking for
   const authCookie = request.cookies.get('token');
-    console.log("Hello auth")
+    // console.log("Hello auth")
   // If the cookie is not found, redirect to the authentication page
   if (!authCookie) {
     return NextResponse.redirect(new URL('/login', request.url));
