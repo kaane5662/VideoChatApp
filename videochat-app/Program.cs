@@ -211,7 +211,7 @@ builder.Services.AddCors(options =>
         policy  =>
         {
             policy.WithOrigins("http://localhost:5133",
-                                "http://localhost:3000","http://localhost:5173", "https://accounts.google.com")
+                                "http://localhost:3000","http://localhost:5173", "https://accounts.google.com", "video-chat-app-eight-zeta.vercel.app")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
