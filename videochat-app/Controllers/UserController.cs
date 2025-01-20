@@ -54,7 +54,7 @@ public class UserController : ControllerBase {
         // Console.WriteLine(generatedToken);
         Response.Cookies.Append("token",generatedToken, new CookieOptions{
                 Expires = DateTime.UtcNow.AddHours(4),
-                SameSite = _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? SameSiteMode.None:SameSiteMode.Lax,
+                SameSite = SameSiteMode.Lax,
                 HttpOnly = true,
                 Secure = _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? true:false
             });
@@ -85,7 +85,7 @@ public class UserController : ControllerBase {
         
         Response.Cookies.Append("token",generatedToken, new CookieOptions{
                 Expires = DateTime.UtcNow.AddHours(4),
-                SameSite = _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? SameSiteMode.None:SameSiteMode.Lax,
+                SameSite = SameSiteMode.Lax,
                 HttpOnly = true,
                 Secure = _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? true:false
             });
@@ -236,7 +236,7 @@ public class UserController : ControllerBase {
         CookieOptions cookieOptions = CookieHelper.GenerateCookie(4);
         Response.Cookies.Append("token",generatedToken, new CookieOptions{
                 Expires = DateTime.UtcNow.AddHours(4),
-                SameSite = _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? SameSiteMode.None:SameSiteMode.Lax,
+                SameSite = SameSiteMode.Lax,
                 HttpOnly = true,
                 Secure = _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? true:false
             });
