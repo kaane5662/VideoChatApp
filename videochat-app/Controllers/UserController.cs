@@ -52,8 +52,12 @@ public class UserController : ControllerBase {
         var dbUser = _context.Users.Add(newUser);  
         string generatedToken = _jwtHelper.generateToken(dbUser.Entity.Id);
         // Console.WriteLine(generatedToken);
-        CookieOptions cookieOptions = CookieHelper.GenerateCookie(4);
-        Response.Cookies.Append("token",generatedToken, cookieOptions);
+        Response.Cookies.Append("token",generatedToken, new CookieOptions{
+                Expires = DateTime.UtcNow.AddHours(4),
+                SameSite = _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? SameSiteMode.None:SameSiteMode.Lax,
+                HttpOnly = true,
+                Secure = _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? true:false
+            });
         await _context.SaveChangesAsync();
 
         return Created("user",newUser);
@@ -78,8 +82,13 @@ public class UserController : ControllerBase {
         // Console.WriteLine(user.Id);
         string generatedToken = _jwtHelper.generateToken(user.Id);
         // Console.WriteLine(generatedToken);
-        CookieOptions cookieOptions = CookieHelper.GenerateCookie(4);
-        Response.Cookies.Append("token",generatedToken, cookieOptions);
+        
+        Response.Cookies.Append("token",generatedToken, new CookieOptions{
+                Expires = DateTime.UtcNow.AddHours(4),
+                SameSite = _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? SameSiteMode.None:SameSiteMode.Lax,
+                HttpOnly = true,
+                Secure = _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? true:false
+            });
         return Ok();
     }
 
@@ -225,7 +234,12 @@ public class UserController : ControllerBase {
         }
         string generatedToken = _jwtHelper.generateToken(userExists.Id);
         CookieOptions cookieOptions = CookieHelper.GenerateCookie(4);
-        Response.Cookies.Append("token",generatedToken, cookieOptions);
+        Response.Cookies.Append("token",generatedToken, new CookieOptions{
+                Expires = DateTime.UtcNow.AddHours(4),
+                SameSite = _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? SameSiteMode.None:SameSiteMode.Lax,
+                HttpOnly = true,
+                Secure = _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? true:false
+            });
         
 
 
