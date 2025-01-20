@@ -112,7 +112,7 @@ public class ProfileController : ControllerBase {
         try{
             Console.WriteLine(id);
             Profile otherProfile = await _context.Profiles.FirstAsync(p=>p.Id == id);
-
+            
             FetchResponse profile = await _pc.FetchAsync(new FetchRequest{
                 Ids=new[] { (string) otherProfile.IdentityUserId},
             });

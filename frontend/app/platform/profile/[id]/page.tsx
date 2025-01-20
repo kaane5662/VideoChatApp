@@ -1,6 +1,5 @@
 // "use client"
 import ProfileBanner from "@/app/components/profiles/ProfileBanner";
-import Similar from "@/app/components/profiles/Similar";
 import SimilarProfilesToProfile from "@/app/components/profiles/SimilarProfilesToProfile";
 import PaddedList from "@/app/helpers/PaddedList"
 import { IProfile } from "@/app/interfaces"

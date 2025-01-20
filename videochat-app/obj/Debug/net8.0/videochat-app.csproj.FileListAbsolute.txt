@@ -129,3 +129,8 @@ C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\DotNetEnv.
 C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\Sprache.dll
 C:\Users\hte12\Downloads\videochat-app\videochat-app\obj\Debug\net8.0\videochat-app.sourcelink.json
 C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\AspNet.Security.OAuth.GitHub.dll
+C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\publish\web.config
+C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\publish\appsettings.Development.json
+C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\publish\appsettings.json
+C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\publish\videochat-app.deps.json
+C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\publish\videochat-app.runtimeconfig.json

@@ -19,6 +19,7 @@ export default function MessageThread({params}:any){
     const hasConnection = useRef(false)
     const [earliest,setEarliest] = useState(new Date())
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
+    const hasRun = useRef(false)
     const [text,setText] = useState("")
     // const {user,setUser}= useUser()
     const getMessagesThread = async ()=>{
@@ -32,12 +33,15 @@ export default function MessageThread({params}:any){
     }
     const getThreadMessages = async ()=>{
         try{
+            if(hasRun.current) return;
+            hasRun.current = true
            var data = await getMessagesInThread(id,earliest)
            console.log(data)
            if(!data?.error && data.length > 0){
                 setEarliest( new Date(data[data.length-1].createdAt))
            }
            setMessages(prev=>[...data.toReversed(),...prev])
+           hasRun.current = false
         }catch(error){
             console.log(error)
         }

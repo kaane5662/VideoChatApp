@@ -49,8 +49,13 @@ public class UserController : ControllerBase {
             PasswordHash = passwordHash, 
             UserName = userSignUp.UserName,
         };      
-         _context.Users.Add(newUser);   
-         await _context.SaveChangesAsync();
+        var dbUser = _context.Users.Add(newUser);  
+        string generatedToken = _jwtHelper.generateToken(dbUser.Entity.Id);
+        // Console.WriteLine(generatedToken);
+        CookieOptions cookieOptions = CookieHelper.GenerateCookie(4);
+        Response.Cookies.Append("token",generatedToken, cookieOptions);
+        await _context.SaveChangesAsync();
+
         return Created("user",newUser);
         
     }
@@ -59,9 +64,9 @@ public class UserController : ControllerBase {
     public async Task<IActionResult> Login([FromForm] UserInput userLogin) {
         Console.WriteLine(userLogin.Email);
         var user = await _context.Users
-        .FirstAsync(u => u.Email == userLogin.Email );
+        .FirstOrDefaultAsync(u => u.Email == userLogin.Email );
         if (user == null){
-            return BadRequest("Invalid login attempt.");
+            return BadRequest("User does not exist");
         }
         var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(userLogin.Password));
         var passwordHash = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(userLogin.Password)));
@@ -70,9 +75,9 @@ public class UserController : ControllerBase {
         if (user.PasswordHash != passwordHash ) {
             return BadRequest("Invalid password");
         }
-        Console.WriteLine(user.Id);
+        // Console.WriteLine(user.Id);
         string generatedToken = _jwtHelper.generateToken(user.Id);
-        Console.WriteLine(generatedToken);
+        // Console.WriteLine(generatedToken);
         CookieOptions cookieOptions = CookieHelper.GenerateCookie(4);
         Response.Cookies.Append("token",generatedToken, cookieOptions);
         return Ok();
@@ -83,7 +88,7 @@ public class UserController : ControllerBase {
     public async Task<IActionResult> LogOut() {
         Console.WriteLine("Logging out");
         try{
-            string token = Request.Cookies["token"].ToString();
+            // string token = Request.Cookies["token"].ToString();  
             CookieOptions expiredOptions = CookieHelper.GenerateCookie(-1);
             Response.Cookies.Append("token","", expiredOptions);
             return Ok();

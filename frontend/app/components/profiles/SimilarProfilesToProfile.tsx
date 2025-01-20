@@ -2,7 +2,6 @@ import { IProfile } from "@/app/interfaces"
 import { getSimilarProfilesToProfile } from "@/app/services/profiles"
 import { cookies } from "next/headers"
 import { useEffect, useState } from "react"
-import Similar from "./Similar"
 import ProfileHeader from "./ProfileHeader"
 
 export default async function SimilarProfilesToProfile({id}:{id:string}){

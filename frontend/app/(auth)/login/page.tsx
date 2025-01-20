@@ -19,10 +19,10 @@ export default  function Login(){
         const formData = new FormData(e.target)
         try{
             await login(formData)
-            router.push("/platform/dashboard")
+            router.replace("/platform/dashboard")
         }catch(error:any){
             setError(error.message)
-        }
+        }finally{()=>setError('')}
     }
 
     const onGoogleSubmit = ()=>{
@@ -54,10 +54,10 @@ export default  function Login(){
 
                     </div>     
                 </div>
-                {error.length > 0 && (<p className="text-red-600">{error}</p>)}
-                <button type = "submit" className=" bg-secondary text-white p-4 rounded-xl shadow-md ">Log In</button>  
+                {error.length > 0 && (<p className="text-red-700 text-sm">{error}</p>)}
+                <button type = "submit" className=" bg-secondary text-white p-4 rounded-xl shadow-md hover:opacity-70 duration-300 ">Log In</button>  
                 <div className="flex gap-4">
-                    <button type="button" onClick={onGithubSubmit} className="w-full justify-center p-3 flex gap-4 items-center bg-complementary text-secondary border-2 border-opacity-15 rounded-xl shadow-md"> <FaGithub size={20}></FaGithub> Sign In</button>
+                    <button type="button" onClick={onGithubSubmit} className="w-full justify-center p-3 flex gap-4 items-center bg-complementary text-secondary border-2 border-opacity-15 rounded-xl shadow-md hover:opacity-70 duration-300"> <FaGithub size={20}></FaGithub> Sign In</button>
                 </div>
                 <h3 className="text-center text-opacity-50 text-black">New here? <Link className="text-secondary underline" href={"/signup"}>Create an account</Link></h3>
                 {/* <div className="flex gap-4">
