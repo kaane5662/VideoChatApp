@@ -84,7 +84,7 @@ public class MessagesController : ControllerBase {
                     Text = m.Text,
                     CreatedAt = m.CreatedAt,
                     FirstName = p.FirstName,
-                    FromProfileId=m.FromProfileId
+                    FromProfileId=m.FromProfileId,
                 }
             ).ToListAsync();
             var profileOther = await _context.Profiles.FirstOrDefaultAsync(p=> p.Id == (profile.Id == validDm.Profile1Id ? validDm.Profile2Id:validDm.Profile1Id) ) ;
@@ -113,7 +113,8 @@ public class MessagesController : ControllerBase {
                     Text = m.Text,
                     CreatedAt = m.CreatedAt,
                     FirstName = p.FirstName,
-                    FromProfileId=m.FromProfileId
+                    FromProfileId=m.FromProfileId,
+                    Id=m.Id
                 }
             ).Take(10).ToListAsync();
             // messages = messages.OrderByDescending(m => m.CreatedAt).ToList();
@@ -149,6 +150,45 @@ public class MessagesController : ControllerBase {
             return BadRequest(err.Message);
         }
     }
+
+    [HttpDelete("bubble/{id}")]
+    [Authorize]
+    public async Task<IActionResult> DeleteMessageBubble(int id) {
+        try{
+            
+            string IdentityUserId = HttpContext.Items["UserId"]?.ToString();
+            var profile = await _context.Profiles.FirstAsync(p=>p.IdentityUserId == IdentityUserId);
+            var existingMessage = await _context.Messages.FirstOrDefaultAsync(m=> m.FromProfileId == profile.Id && m.Id == id);
+            if(existingMessage == null) return Forbid();
+            _context.Messages.Remove(existingMessage);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }catch(Exception err){
+            Console.WriteLine(err.ToString());
+            return BadRequest(err.Message);
+        }
+    }
+    [HttpPut("bubble/{id}")]
+    [Authorize]
+    public async Task<IActionResult> EditMessageBubble(int id, [FromBody] Dictionary<string,string> req) {
+        try{
+            Console.WriteLine("Editing message");
+            string text = req["text"];
+            string IdentityUserId = HttpContext.Items["UserId"]?.ToString();
+            var profile = await _context.Profiles.FirstAsync(p=>p.IdentityUserId == IdentityUserId);
+            var existingMessage = await _context.Messages.FirstOrDefaultAsync(m=> m.FromProfileId == profile.Id && m.Id == id);
+            if(existingMessage == null) return Forbid();
+            existingMessage.Text = text ?? existingMessage.Text;
+            _context.Messages.Update(existingMessage);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }catch(Exception err){
+            Console.WriteLine(err.ToString());
+            return BadRequest(err.Message);
+        }
+    }
+
+    
 
     // [HttpPost]
     // public async Task<IActionResult> CreateDirectMessageThreadWith([FromBody] Dictionary<string, int> request) {

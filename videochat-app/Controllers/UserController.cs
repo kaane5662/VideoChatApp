@@ -93,13 +93,14 @@ public class UserController : ControllerBase {
     }
 
     [HttpDelete("")]
-    [Authorize]
+    
     public async Task<IActionResult> LogOut() {
-        Console.WriteLine("Logging out");
         try{
             // string token = Request.Cookies["token"].ToString();  
-            CookieOptions expiredOptions = CookieHelper.GenerateCookie(-1);
-            Response.Cookies.Append("token","", expiredOptions);
+            
+            Response.Cookies.Append("token","", new CookieOptions{});
+            Response.Cookies.Append("test","jkrtkljklrtklhrtklhrtlkjlk", new CookieOptions{});
+            Console.WriteLine("Logging out");
             return Ok();
         }catch(Exception err){
             return BadRequest(err.Message);

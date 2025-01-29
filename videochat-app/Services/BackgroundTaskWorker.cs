@@ -85,6 +85,8 @@ namespace Services {
                 });
                 await _hubContext.Clients.Group(newRoomId).SendAsync("RoomJoined");
                 var otherProfileData = await _context.Profiles.FirstAsync(p => p.IdentityUserId == similarProfile.Id);
+                profileData.SimilarityScore = similarProfile.Score.Value;
+                otherProfileData.SimilarityScore = similarProfile.Score.Value;
                 await _hubContext.Clients.Client(user.ConnectionId).SendAsync("OnClientJoin", _connections[similarProfile.Id], otherProfileData);
                 await _hubContext.Clients.Client( _connections[similarProfile.Id]).SendAsync("OnClientJoin", user.ConnectionId, profileData);
                 return true;

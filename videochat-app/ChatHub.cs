@@ -119,23 +119,23 @@ namespace SignalRChat {
             await Clients.OthersInGroup(roomId).SendAsync("MessageRecieved",Context.ConnectionId,message);
         }
 
-        public async Task SendDirectMessage(int dmId, string text){
+        public async Task<Object> SendDirectMessage(int dmId, string text){
             Console.WriteLine("Message: "+text);
             string IdentityUserId = Context.GetHttpContext().Items["UserId"]?.ToString();
             var profile = await _context.Profiles.FirstAsync(p=>p.IdentityUserId == IdentityUserId);
             var validDm = await _context.DirectMessages.FirstOrDefaultAsync(dm => dm.Id == dmId && (dm.Profile1Id == profile.Id || dm.Profile2Id == profile.Id));
             if(validDm == null) {
                 Console.WriteLine("Not valud");
-                return;
+                return null;
             }
             Console.WriteLine("Basic checks passed");
             _dmRooms.TryGetValue(dmId,out var roomId);
             Console.WriteLine("Room id"+roomId);
-            if (roomId == null) return;
-            await _context.Messages.AddAsync(new Message { DirectMessageId = dmId, Text =text, FromProfileId=profile.Id});
+            if (roomId == null) return null;
+            var newMessage = await _context.Messages.AddAsync(new Message { DirectMessageId = dmId, Text =text, FromProfileId=profile.Id});
             await _context.SaveChangesAsync();
-            await Clients.OthersInGroup(roomId).SendAsync("MessageRecieved",text);
-            Console.WriteLine(roomId);
+            await Clients.Group(roomId).SendAsync("MessageRecieved", newMessage.Entity);
+            return null;
         }
 
         public async Task TypingInDmThread(int dmId){
@@ -164,6 +164,35 @@ namespace SignalRChat {
             await Groups.AddToGroupAsync(Context.ConnectionId,_dmRooms[dmId]);
         }
 
+        public async Task DeleteMessageBubble(int dmId, int id) {
+            Console.WriteLine("Deleting message");
+            string IdentityUserId = Context.GetHttpContext().Items["UserId"]?.ToString();
+            var profile = await _context.Profiles.FirstAsync(p=>p.IdentityUserId == IdentityUserId);
+            var existingMessage = await _context.Messages.FirstOrDefaultAsync(m=> m.FromProfileId == profile.Id && m.Id == id);
+            if(existingMessage == null) await Clients.Client(Context.ConnectionId).SendAsync("Error",new{error="Forbidden",status=401});
+            _context.Messages.Remove(existingMessage);
+            await _context.SaveChangesAsync();
+            _dmRooms.TryGetValue(dmId, out var roomId);
+            await Clients.Group(roomId).SendAsync("MessageDeleted",id);
+            return;
+            
+        }
+        
+        public async Task EditMessageBubble(int dmId, int id,string text) {
+            
+            Console.WriteLine("Editing message");
+            string IdentityUserId = Context.GetHttpContext().Items["UserId"]?.ToString();
+            var profile = await _context.Profiles.FirstAsync(p=>p.IdentityUserId == IdentityUserId);
+            var existingMessage = await _context.Messages.FirstOrDefaultAsync(m=> m.FromProfileId == profile.Id && m.Id == id);
+            if(existingMessage == null) return;
+            existingMessage.Text = text ?? existingMessage.Text;
+            _context.Messages.Update(existingMessage);
+            _dmRooms.TryGetValue(dmId, out var roomId);
+            await _context.SaveChangesAsync();
+            await Clients.Group(roomId).SendAsync("MessageEdited",id,text);
+            return;
+            
+        }
         
         
 

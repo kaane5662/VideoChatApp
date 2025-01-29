@@ -46,11 +46,12 @@ export async function signUp(FormData:FormData){
 export async function signOut(cookie:string){
     // "use server"
     console.log("Logging out")
+    console.log(cookie)
     try{
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/user`,{credentials:"include",method:"DELETE"})
+        const res = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/api/user`,{withCredentials:true})
         // redirect("/login")
-    }catch(error){
-        console.log(error)
+    }catch(error:any){
+        console.log(error.message)
     }  
 }
 

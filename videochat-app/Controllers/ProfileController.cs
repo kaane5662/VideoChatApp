@@ -149,8 +149,17 @@ public class ProfileController : ControllerBase {
             QueryResponse matchingIds = await _pc.QueryAsync(new QueryRequest{
                 Vector= profileVector,
                 TopK=25,
-                IncludeValues=true
-            });
+                IncludeValues=true,
+                
+                Filter =new Pinecone.Metadata
+                {
+                    ["Id"] =
+                        new Pinecone.Metadata
+                        {
+                            ["$ne"] = (string) UserId,
+                        }
+                },
+                        });
             
             // Console.WriteLine(matchingIds);
             var matchingProfiles = new List<Profile>();

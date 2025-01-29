@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import LandingNavbar from "../components/main/LandingNavbar";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -12,7 +13,11 @@ export default function RootLayout({
 }>) {
   return (
     // <html lang="en">
-      <div>{children}</div>
+      <div className="bg-complementary text-secondary">
+        <LandingNavbar></LandingNavbar>
+        <div>{children}</div>
+        
+      </div>
    
   );
 }

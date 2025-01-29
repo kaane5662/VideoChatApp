@@ -53,5 +53,6 @@ export interface IMessage{
     text:string,
     createdAt:string,
     firstName:string,
-    fromProfileId:number
+    fromProfileId:number,
+    id:number
 }

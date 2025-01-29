@@ -35,7 +35,7 @@ export default  function Login(){
     }
 
     return(
-        <main className=" bg-slate-50 text-secondary items-center flex flex-col justify-center h-screen ">
+        <main className="  text-secondary items-center flex flex-col justify-center h-screen ">
             <form onSubmit={submitForm} className="gap-4 flex flex-col w-[500px] h-fit">
                 <div className="flex gap-2 flex-col">
                     <h1 className="font-bold text-4xl">Welcome back!</h1>

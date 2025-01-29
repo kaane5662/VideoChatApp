@@ -16,6 +16,7 @@ export default function Chat({messages,sendMessage, connectedProfile}:{messages:
                         <div className="flex flex-col gap-0">
                             <h1 className="font-bold text-opacity-50"><span onClick={()=>router.push(`/platform/profiles/${connectedProfile.id}`)} className=" text-secondary underline hover:cursor-pointer">{connectedProfile?.firstName}</span> has joined</h1>
                             <p className="text-sm text-opacity-50 text-secondary">{connectedProfile?.industry}</p>
+                            <p className="border-2 rounded-xl p-1 px-3 text-xs w-fit">{connectedProfile.similarityScore && (connectedProfile.similarityScore*100).toFixed(0)}% Match</p>
                         </div>
                         <PaddedList items={connectedProfile?.frameworks}></PaddedList>
                     </div>

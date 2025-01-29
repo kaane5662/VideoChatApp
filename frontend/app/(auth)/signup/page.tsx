@@ -32,7 +32,7 @@ export default function SignUp(){
 
 
     return(
-        <main className=" bg-slate-50  items-center    flex justify-center h-screen text-secondary">
+        <main className=" items-center    flex justify-center h-screen text-secondary">
             <form onSubmit={submitForm} className="gap-4 flex flex-col w-[500px] h-fit">
                 <div className="flex gap-2 flex-col">
                     <h1 className="font-bold text-4xl">Join Us!</h1>

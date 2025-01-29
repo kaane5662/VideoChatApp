@@ -1,6 +1,6 @@
 "use client"
 import { IMessage, IProfile } from "@/app/interfaces";
-import { getDirectMessagesThread, getMessagesInThread } from "@/app/services/messages";
+import { deleteMessageBubble, editMessageBubble, getDirectMessagesThread, getMessagesInThread } from "@/app/services/messages";
 import { useEffect, useRef, useState } from "react";
 import { IoSend } from "react-icons/io5";
 import * as signalR from '@microsoft/signalr';
@@ -21,6 +21,7 @@ export default function MessageThread({params}:any){
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const hasRun = useRef(false)
     const [text,setText] = useState("")
+    const [editing,setEditing] = useState<number | null>(null)
     // const {user,setUser}= useUser()
     const getMessagesThread = async ()=>{
         try{
@@ -46,7 +47,23 @@ export default function MessageThread({params}:any){
             console.log(error)
         }
     }
-
+    const deleteMessage = async (messageId:number)=>{
+        try{
+            await connection?.invoke("DeleteMessageBubble", Number(id),Number(messageId))
+        }catch(err){
+            console.log(err)
+        }
+        
+    }
+    const editMessage = async (messageId:number, formData:FormData)=>{
+        console.log("You here",id)
+        const text = formData.get("text") as string
+        try{
+            await connection?.invoke("EditMessageBubble", Number(id),Number(messageId),text)
+        }catch(err){
+            console.log(err)
+        }finally{setEditing(null)}
+    }
     
     const initLiveChat = async ()=>{
         if(hasConnection.current == true) return
@@ -58,10 +75,25 @@ export default function MessageThread({params}:any){
           .build();
         setConnection(hubConnection);
         
-        hubConnection.on('MessageRecieved', async(text)=>{
+        hubConnection.on('MessageRecieved', async(message:IMessage)=>{
             console.log("Message recieved"+OtherProfile)
             if(OtherProfile == null) return
-            setMessages(prev=>[...prev,{ text:text,firstName:OtherProfile.firstName,createdAt:new Date(Date.now()).toString(), fromProfileId:OtherProfile.id}])
+            setMessages(prev=>[...prev,message])
+        })
+        hubConnection.on('MessageEdited', async(id:number, text:string)=>{
+            console.log("Message edited"+id,text)
+            if(OtherProfile == null) return
+            setMessages((prevMessages) =>
+                prevMessages.map((m) => (m.id === id ? { ...m, text } : m))
+            );
+        })
+        hubConnection.on('MessageDeleted', async(id:number)=>{
+            console.log("Message recieved"+OtherProfile)
+            if(OtherProfile == null) return
+            setMessages((prevMessages) =>
+                prevMessages.filter((m) => m.id !== id)
+            );
+            
         })
         hubConnection.on('UserTyping', async(connectionId:string,profile:IProfile)=>{
             console.log("User typing recieved"+OtherProfile)
@@ -86,9 +118,8 @@ export default function MessageThread({params}:any){
         try{
             console.log(text)
             if(text.length < 1 || MyProfile == null) return
-            await connection?.invoke("SendDirectMessage",Number(id),text)
-            setMessages(prev=>[...prev,{ text:text,firstName:MyProfile.firstName,createdAt:new Date(Date.now()).toString(), fromProfileId:MyProfile.id}])
-            setText("")
+            await connection?.invoke("SendDirectMessage",Number(id),text) as IMessage
+            
            
         }catch(error){
             console.log(error)
@@ -157,9 +188,24 @@ export default function MessageThread({params}:any){
                 <button onClick={getThreadMessages} className="text-sm rounded-xl px-4 p-2 bg-secondary text-complementary">Load More</button>
                 {MyProfile && Messages?.map((message:IMessage,index:number)=>{
                     return(
-                        <div key={index} className={`flex flex-col gap-1 w-[50%] ${message.fromProfileId == MyProfile.id ? "ml-auto":" "}`}>
-                            <p className={`px-4 p-2 text-sm w-fit rounded-xl shadow-md ${message.fromProfileId == MyProfile.id ? "bg-secondary text-white":" bg-secondary bg-opacity-10"}`}>{message.text}</p>
-                            <h3 className="text-sm text-opacity-50 text-secondary">{message.firstName + " " + new Date(message.createdAt).toLocaleString()} </h3>
+                        <div key={index} className={`flex relative flex-col gap-1 w-[50%] ${message.fromProfileId == MyProfile.id ? "ml-auto":" "}`}>
+                            {/* <p className="text-black">{message.id}</p> */}
+                            {message.fromProfileId == MyProfile.id && (<div className="flex gap-4 items-center text-xs">
+                                <button onClick={()=>deleteMessage(message.id)}>Remove</button>
+                                <button onClick={()=>setEditing(message.id)}>Edit</button>
+                            </div>)}
+                            {editing && message.id == editing ? (
+                                <form className="flex gap-2" action={(e)=>editMessage(message.id,e)}>
+                                    <textarea name="text" defaultValue={message.text} className={`px-4 p-2 text-sm w-fit rounded-xl shadow-md border-2`}></textarea>
+                                    <button type="submit" className="rounded-xl w-fit h-fit bg-secondary text-sm p-2 px-4 text-complementary">Submit</button>
+                                </form>
+                            ):(
+
+                            <div>
+                                <p className={`px-4 p-2 text-sm w-fit rounded-xl shadow-md ${message.fromProfileId == MyProfile.id ? "bg-secondary text-white":" bg-secondary bg-opacity-10"}`}>{message.text}</p>
+                                <h3 className="text-sm text-opacity-50 text-secondary">{ (message.firstName || (message.fromProfileId == OtherProfile.id ? OtherProfile.firstName : MyProfile.firstName)) + " " + new Date(message.createdAt).toLocaleString()} </h3>
+                            </div>
+                            )}
                         </div>
                         
                     )

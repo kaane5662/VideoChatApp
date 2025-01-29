@@ -134,3 +134,6 @@ C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\publish\ap
 C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\publish\appsettings.json
 C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\publish\videochat-app.deps.json
 C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\publish\videochat-app.runtimeconfig.json
+C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\Stripe.net.dll
+C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll
+C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\System.Security.Cryptography.ProtectedData.dll
