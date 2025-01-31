@@ -1,11 +1,12 @@
 {
   "Version": 1,
-  "Hash": "1IK8XQ0YoMPXSsWU5NuVUljxt+ywYRoRXh9p92rHYPg=",
+  "Hash": "0WRHhrWqq7nBjrkzw/ReJ5dhrsdnFKW1kN/Rlq6yx4k=",
   "Source": "videochat-app",
   "BasePath": "_content/videochat-app",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
   "DiscoveryPatterns": [],
-  "Assets": []
+  "Assets": [],
+  "Endpoints": []
 }

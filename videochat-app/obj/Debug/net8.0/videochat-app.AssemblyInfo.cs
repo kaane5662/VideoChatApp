@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("videochat-app")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+19fd7bbbaf02ef2ba110618fd476e6e20a80e802")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0b9ba7dcfb47c73ac3d9b7824b79385be073c1b3")]
 [assembly: System.Reflection.AssemblyProductAttribute("videochat-app")]
 [assembly: System.Reflection.AssemblyTitleAttribute("videochat-app")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

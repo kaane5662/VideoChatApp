@@ -82,128 +82,7 @@ builder.Services.AddAuthentication(options=>{
         
     };
 });
-// .AddCookie("GoogleCookie", options =>
-//     {
-//         options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-//         options.LoginPath = "/api/user/google"; // Redirect path for login
-//         options.LogoutPath = "/api/user/logout"; // Redirect path for logout
-//         options.Cookie.HttpOnly = true;
-//         options.Cookie.SameSite = SameSiteMode.Lax;
-// })
-// .AddCookie("GithubCookie", options =>
-// {
-//     options.Cookie.Name = "GithubCookie";
-//     // options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-//     options.Cookie.HttpOnly = true;
-//     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Use Secure cookies in production
-//     // options.SlidingExpiration = true;
-//     // options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Always for HTTPS
-//     options.Cookie.SameSite = SameSiteMode.Lax;
-// })
-// .AddGoogle(options =>
-//     {
-//         options.ClientId = builder.Configuration["Google:ClientId"];
-//         options.ClientSecret = builder.Configuration["Google:ClientSecret"];
-//         options.SignInScheme = "GoogleCookie";
-//         // options.CallbackPath = "/signin-google";
-//         options.SaveTokens = true;
-//         options.Scope.Add("email");
-//         options.Scope.Add("profile");
-//         // options.
-//         options.Events = new OAuthEvents
-//         {
-//             OnCreatingTicket = async context =>
-//             {
-//                 // Retrieve the access token
-//                 var accessToken = context.AccessToken;
-//                 var email = context.Identity.FindFirst(ClaimTypes.Email)?.Value;
-//                 var _userHelper = context.HttpContext.RequestServices.GetRequiredService<UserHelper>();
-//                 Console.WriteLine("Hello there from on creating ticket "+email);
-//                 var existingUser = await _userHelper.checkUserExists(email);
-//                 if(existingUser != null){
-//                     context.HttpContext.Items["UserId"] = existingUser.Id;
-//                     context.Identity.AddClaim(new Claim("UserId", existingUser.Id));
-//                 }else{
-//                     Console.WriteLine("Creating the user");
-//                     await _userHelper.createUser(email,Guid.NewGuid().ToString());
-//                     var newUser = await _userHelper.checkUserExists(email);
-//                     context.HttpContext.Items["UserId"] = newUser.Id;
-//                     context.Identity.AddClaim(new Claim("UserId", newUser.Id));
-//                     Console.WriteLine("Hello");
-//                 }
-//                 // Console.WriteLine(context.HttpContext.Items?["UserId"]);
-//                 // Additional processing if needed
-//                 Console.WriteLine("Created ticket successfully");
-//                 // await Task.CompletedTask;
-//             },
-//             OnRemoteFailure = context =>
-//             {
-                
-//                 Console.WriteLine("Why did Google oauth fail"+context.Failure.Message);
-//                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-//                 return Task.CompletedTask;
-//             },
-           
-//         };
-// })
-// .AddOAuth("Github",options =>
-// {
-//     options.ClientId = builder.Configuration["GitHub:ClientId"];
-//     options.ClientSecret = builder.Configuration["GitHub:ClientSecret"];
-//     options.CallbackPath = "/api/User/github/callback";
-//     options.AuthorizationEndpoint = "https://github.com/login/oauth/authorize";
-//     options.TokenEndpoint = "https://github.com/login/oauth/access_token";
-//     options.UserInformationEndpoint = "https://api.github.com/user";
-//     options.SignInScheme = "GithubCookie";
 
-//     options.SaveTokens = true;
-//     // Request additional scopes if needed
-//     options.Scope.Add("read:user");
-//     options.Scope.Add("user:email");
-
-//     // options.SaveTokens = true;
-
-//     options.Events = new OAuthEvents
-//     {
-//         OnCreatingTicket = async context =>
-//         {
-            
-//             string email = await GithubHelper.GetPrimaryEmail(context);
-//             Console.WriteLine(email);
-//             Console.WriteLine("Oauth state"+context.Request.Query["state"]);
-//             var _userHelper = context.HttpContext.RequestServices.GetRequiredService<UserHelper>();
-//             Console.WriteLine("Hello there from on creating ticket "+email);
-//             var existingUser = await _userHelper.checkUserExists(email);
-//             if(existingUser != null){
-//                 // context.HttpContext.Items["UserId"] = existingUser.Id;
-//                 // context.Identity.AddClaim(new Claim("UserId", existingUser.Id));
-//             }else{
-//                 Console.WriteLine("Creating the user");
-//                 // await _userHelper.createUser(email,Guid.NewGuid().ToString());
-//                 var newUser = await _userHelper.checkUserExists(email);
-//                 // context.HttpContext.Items["UserId"] = newUser.Id;
-//                 // context.Identity.AddClaim(new Claim("UserId", newUser.Id));
-//                 Console.WriteLine("Hello");
-//             }
-//                 // Console.WriteLine(context.HttpContext.Items?["UserId"]);
-//                 // Additional processing if needed
-//             Console.WriteLine("Created ticket successfully");
-//         },
-//         OnRedirectToAuthorizationEndpoint = context =>
-//         {
-//             context.Response.Redirect(context.RedirectUri);
-//             return Task.CompletedTask;
-//         },
-//         OnRemoteFailure = context =>
-//         {
-//             // Handle errors
-//             Console.WriteLine("Github Oauth error: "+context.Failure.Message);
-//             Console.WriteLine("Oauth state error "+ context.Request.Query["state"]);  
-//             context.Response.StatusCode = 401;
-//             return Task.CompletedTask;
-//         }
-//     };
-// });
 
 builder.Services.AddCors(options =>
 {
@@ -211,7 +90,7 @@ builder.Services.AddCors(options =>
         policy  =>
         {
             policy.WithOrigins("http://localhost:5133",
-                                "http://localhost:3000","http://localhost:5173", "https://accounts.google.com", "https://video-chat-app-eight-zeta.vercel.app", "https://videochatapp-fwil.onrender.com")
+                                "http://localhost:3000","http://localhost:5173", "https://accounts.google.com", "https://video-chat-app-eight-zeta.vercel.app", "https://videochatapp-fwil.onrender.com", "https://videochatapp-frontend.onrender.com")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();

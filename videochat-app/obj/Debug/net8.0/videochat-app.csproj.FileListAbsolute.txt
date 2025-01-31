@@ -137,3 +137,6 @@ C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\publish\vi
 C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\Stripe.net.dll
 C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll
 C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\System.Security.Cryptography.ProtectedData.dll
+C:\Users\hte12\Downloads\videochat-app\videochat-app\bin\Debug\net8.0\videochat-app.staticwebassets.endpoints.json
+C:\Users\hte12\Downloads\videochat-app\videochat-app\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\hte12\Downloads\videochat-app\videochat-app\obj\Debug\net8.0\staticwebassets\msbuild.videochat-app.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
