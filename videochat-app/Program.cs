@@ -90,7 +90,7 @@ builder.Services.AddCors(options =>
         policy  =>
         {
             policy.WithOrigins("http://localhost:5133",
-                                "http://localhost:3000","http://localhost:5173", "https://accounts.google.com", "https://video-chat-app-eight-zeta.vercel.app", "https://videochatapp-fwil.onrender.com", "https://videochatapp-frontend.onrender.com", "https://techmatch.live")
+                                "http://localhost:3000","http://localhost:5173", "https://accounts.google.com", "https://video-chat-app-eight-zeta.vercel.app", "https://videochatapp-fwil.onrender.com", "https://videochatapp-frontend.onrender.com", "https://techmatch.live", "https://www.techmatch.live")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
