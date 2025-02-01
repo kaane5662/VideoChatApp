@@ -57,7 +57,7 @@ public class UserController : ControllerBase {
                 SameSite = _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? SameSiteMode.None:SameSiteMode.Lax,
                 HttpOnly = true,
                 Secure = _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? true:false,
-                Domain= _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? null : _configuration["Base:Domain"],
+                Domain= _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? _configuration["Base:Domain"]:null,
                 
             });
         await _context.SaveChangesAsync();
@@ -90,7 +90,7 @@ public class UserController : ControllerBase {
                 SameSite = _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? SameSiteMode.None:SameSiteMode.Lax,
                 HttpOnly = true,
                 Secure = _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? true:false,
-                Domain= _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? null : _configuration["Base:Domain"],
+                Domain= _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? _configuration["Base:Domain"]:null,
                 
             });
         return Ok();
@@ -244,7 +244,7 @@ public class UserController : ControllerBase {
                 SameSite = _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? SameSiteMode.None:SameSiteMode.Lax,
                 HttpOnly = true,
                 Secure = _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? true:false,
-                Domain= _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? null : _configuration["Base:Domain"],
+                Domain= _configuration["ASPNETCORE_ENVIRONMENT"] == "Production" ? _configuration["Base:Domain"]:null,
                 
             });
         
