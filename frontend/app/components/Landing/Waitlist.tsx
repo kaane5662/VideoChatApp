@@ -14,9 +14,9 @@ export default function EmailWidget() {
 
 return (
 <>
-    <Script type="" dangerouslySetInnerHTML={{__html: cssLoader}}></Script>
+    <Script id="1" type="" dangerouslySetInnerHTML={{__html: cssLoader}}></Script>
 
-    <Script src="https://prod-waitlist-widget.s3.us-east-2.amazonaws.com/getwaitlist.min.js"></Script>
+    <Script id="2" src="https://prod-waitlist-widget.s3.us-east-2.amazonaws.com/getwaitlist.min.js"></Script>
 
     <div id="getWaitlistContainer" data-waitlist_id="24762" data-widget_type="WIDGET_2"></div>
 
