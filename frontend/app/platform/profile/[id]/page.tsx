@@ -12,7 +12,7 @@ export default async function Profile({params}:any){
     const ProfileData:IProfile = await getProfile(id);
     
     return(
-        <main className=" min-h-screen flex flex-col gap-8 items-center p-24 justify-center">
+        <main className=" min-h-screen flex flex-col gap-8 items-center p-24 py-12 justify-center">
             <ProfileBanner ProfileData={ProfileData}/>
             <SimilarProfilesToProfile id={id}/>
         </main>

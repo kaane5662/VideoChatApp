@@ -13,7 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     // <html lang="en">
-      <div className="bg-complementary text-secondary">
+      <div className="">
         <LandingNavbar></LandingNavbar>
         <div>{children}</div>
         

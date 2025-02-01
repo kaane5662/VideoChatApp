@@ -253,7 +253,7 @@ export default function Peers(){
     
 
     return(
-        <main className=" p-12 flex gap-8 h-screen bg-slate-50 text-secondary">
+        <main className=" p-12 flex gap-8 h-screen bg-slate-50">
             {/* <h1 className="text-sm font-semibold text-black">Room Id: <span className="text-opacity-50 text-black font-normal">{id}</span></h1> */}
             {ConnectedProfile ? (
                

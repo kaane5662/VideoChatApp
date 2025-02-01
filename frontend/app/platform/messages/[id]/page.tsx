@@ -203,7 +203,7 @@ export default function MessageThread({params}:any){
 
                             <div>
                                 <p className={`px-4 p-2 text-sm w-fit rounded-xl shadow-md ${message.fromProfileId == MyProfile.id ? "bg-secondary text-white":" bg-secondary bg-opacity-10"}`}>{message.text}</p>
-                                <h3 className="text-sm text-opacity-50 text-secondary">{ (message.firstName || (message.fromProfileId == OtherProfile.id ? OtherProfile.firstName : MyProfile.firstName)) + " " + new Date(message.createdAt).toLocaleString()} </h3>
+                                <h3 className="text-sm text-slate-400">{ (message.firstName || (message.fromProfileId == OtherProfile.id ? OtherProfile.firstName : MyProfile.firstName)) + " " + new Date(message.createdAt).toLocaleString()} </h3>
                             </div>
                             )}
                         </div>

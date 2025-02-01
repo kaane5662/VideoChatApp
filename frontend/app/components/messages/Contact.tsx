@@ -12,9 +12,9 @@ export default function Contact({directMessage}:{directMessage:IDirectMessage}){
             
             <div className="flex-col gap-2 flex">
                 <h3 className="text-xl font-bold">{directMessage.profileName}</h3>
-                <p className="text-md  text-opacity-50 text-secondary">{directMessage.recentText}</p>
+                <p className="text-md  text-slate-500">{directMessage.recentText}</p>
             </div>
-            <h1 className=" justify-self-end text-sm ml-auto text-secondary text-opacity-50">{directMessage.recentCreatedAt}</h1>
+            <h1 className=" justify-self-end text-sm ml-auto text-slate-500">{directMessage.recentCreatedAt}</h1>
         </div>
     </div>
     )

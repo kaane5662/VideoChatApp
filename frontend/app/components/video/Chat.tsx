@@ -15,21 +15,24 @@ export default function Chat({messages,sendMessage, connectedProfile}:{messages:
                     <div className="flex gap-4 flex-col">
                         <div className="flex flex-col gap-0">
                             <h1 className="font-bold text-opacity-50"><span onClick={()=>router.push(`/platform/profiles/${connectedProfile.id}`)} className=" text-secondary underline hover:cursor-pointer">{connectedProfile?.firstName}</span> has joined</h1>
-                            <p className="text-sm text-opacity-50 text-secondary">{connectedProfile?.industry}</p>
-                            <p className="border-2 rounded-xl p-1 px-3 text-xs w-fit">{connectedProfile.similarityScore && (connectedProfile.similarityScore*100).toFixed(0)}% Match</p>
+                            <p className="text-sm text-slate-500">{connectedProfile?.industry}</p>
+                            <p className="text-white rounded-xl bg-secondary p-1 px-3 text-xs w-fit">{connectedProfile.similarityScore && (connectedProfile.similarityScore*100).toFixed(0)}% Match</p>
                         </div>
                         <PaddedList items={connectedProfile?.frameworks}></PaddedList>
                     </div>
 
                 )
                 }
-                {messages.map((message:IVideoChat,index:number)=>{
-                    return(
-                        
-                            <p key={index} className={`p-1 px-4 w-fit rounded-lg text-sm ${message.isSender ? "bg-secondary text-white": "bg-slate-200 self-end"}`}>{message.message}</p>
-                        
-                    )
-                })}
+                <div className="p-4 gap-4 flex flex-col">
+
+                    {messages.map((message:IVideoChat,index:number)=>{
+                        return(
+                            
+                                <p key={index} className={`p-1 px-4 w-fit rounded-xl text-sm ${message.isSender ? "bg-secondary text-white": "bg-slate-200 self-end"}`}>{message.message}</p>
+                            
+                        )
+                    })}
+                </div>
                 
                 
             </div>

@@ -12,7 +12,7 @@ export default function PlatformLayout({
           
         <div className="flex max-h-screen">
             <PlatformNavbar/>
-            <main className="main-content w-full h-screen overflow-y-scroll">
+            <main className="main-content w-full h-screen overflow-y-scroll ">
                 {children}
             </main>
         </div>

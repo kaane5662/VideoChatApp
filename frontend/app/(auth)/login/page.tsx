@@ -35,7 +35,7 @@ export default  function Login(){
     }
 
     return(
-        <main className="  text-secondary items-center flex flex-col justify-center h-screen ">
+        <main className="   items-center flex flex-col justify-center h-screen ">
             <form onSubmit={submitForm} className="gap-4 flex flex-col w-[500px] h-fit">
                 <div className="flex gap-2 flex-col">
                     <h1 className="font-bold text-4xl">Welcome back!</h1>
@@ -57,9 +57,9 @@ export default  function Login(){
                 {error.length > 0 && (<p className="text-red-700 text-sm">{error}</p>)}
                 <button type = "submit" className=" bg-secondary text-white p-4 rounded-xl shadow-md hover:opacity-70 duration-300 ">Log In</button>  
                 <div className="flex gap-4">
-                    <button type="button" onClick={onGithubSubmit} className="w-full justify-center p-3 flex gap-4 items-center bg-complementary text-secondary border-2 border-opacity-15 rounded-xl shadow-md hover:opacity-70 duration-300"> <FaGithub size={20}></FaGithub> Sign In</button>
+                    <button type="button" onClick={onGithubSubmit} className="w-full justify-center p-3 flex gap-4 items-center bg-complementary  border-2 border-opacity-15 rounded-xl shadow-md hover:opacity-70 duration-300"> <FaGithub size={20}></FaGithub> Sign In</button>
                 </div>
-                <h3 className="text-center text-opacity-50 text-black">New here? <Link className="text-secondary underline" href={"/signup"}>Create an account</Link></h3>
+                <h3 className="text-center text-opacity-50 text-black">New here? <Link className=" underline" href={"/signup"}>Create an account</Link></h3>
                 {/* <div className="flex gap-4">
                     <h3 onClick={onGoogleSubmit} className="w-full justify-center p-3 flex gap-4 items-center border-black border-2 border-opacity-15 rounded-xl shadow-md"> <FaGoogle ></FaGoogle> Sign In</h3>
                 </div> */}

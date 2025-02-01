@@ -32,7 +32,7 @@ export default function SignUp(){
 
 
     return(
-        <main className=" items-center    flex justify-center h-screen text-secondary">
+        <main className=" items-center    flex justify-center h-screen ">
             <form onSubmit={submitForm} className="gap-4 flex flex-col w-[500px] h-fit">
                 <div className="flex gap-2 flex-col">
                     <h1 className="font-bold text-4xl">Join Us!</h1>
@@ -58,8 +58,8 @@ export default function SignUp(){
                 </div>
                 {error.length > 0 && (<p className="text-red-700 text-sm">{error}</p>)}
                 <button type = "submit" className=" bg-secondary text-slate-100 p-4 rounded-xl shadow-md hover:opacity-70 duration-300 ">Create Account</button>
-                <button type="button" onClick={onGithubSubmit} className="w-full justify-center p-3 flex gap-4 items-center bg-complementary text-secondary border-2 border-opacity-15 rounded-xl shadow-md hover:opacity-70 duration-300"> <FaGithub size={20}></FaGithub> Sign In</button>
-                <h3 className="text-center text-opacity-50 text-secondary">Have an account? <Link className="text-secondary underline" href={"/login"}>Log in</Link></h3>
+                <button type="button" onClick={onGithubSubmit} className="w-full justify-center p-3 flex gap-4 items-center bg-complementary  border-2 border-opacity-15 rounded-xl shadow-md hover:opacity-70 duration-300"> <FaGithub size={20}></FaGithub> Sign In</button>
+                <h3 className="text-center text-opacity-50 ">Have an account? <Link className=" underline" href={"/login"}>Log in</Link></h3>
             </form>
         </main>
     )

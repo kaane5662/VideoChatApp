@@ -13,11 +13,11 @@ export default async function Dashboard(){
     const ReccomendedProfiles:IProfile[] = await getSimilarProfiles2(cookies().toString());
     
     return(
-        <main className="  text-secondary h-screen p-12 gap-8 flex flex-col ">
+        <main className="  min-h-screen p-12 gap-8 flex flex-col ">
             {/* <Navbar></Navbar> */}
             <div className="flex flex-col gap-2">
                 <h1 className="font-bold text-4xl ">Hi, {Profile?.firstName}</h1>
-                <h3 className="text-secondary text-opacity-50 text-lg">Your journey to finding the perfect co-founder starts here.</h3>
+                <h3 className="text-slate-500 text-lg">Your journey to finding the perfect co-founder starts here.</h3>
             </div>
             <div className="flex flex-col gap-4">
                 <h1 className="font-bold text-xl ">Activity Overview</h1>
@@ -28,7 +28,7 @@ export default async function Dashboard(){
                 </div>
             </div>
             <div className="flex flex-col gap-4">
-                <h1 className="font-bold text-xl flex gap-8">Recommended Co-Founders </h1>
+                <h1 className="font-bold text-xl flex gap-8">Recommended  </h1>
                 <div className="grid grid-cols-3 gap-8">
                     {ReccomendedProfiles?.map((profile,index)=>{
                         return(

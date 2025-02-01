@@ -5,7 +5,7 @@ export default function CTA(){
                 <div className="flex flex-col gap-4">
                     <h1 className="text-4xl font-bold">Don’t Wait—Your Match is One Click Away
                     </h1>
-                    <p className="text-slate-400">Click below to find your technical match today and turn your ideas into action.</p>
+                    <p className=" text-slate-200">Click below to find your technical match today and turn your ideas into action.</p>
 
                 </div>
                 <button className=" bg-complementary w-fit font-semibold text-secondary shadow-md p-3 rounded-xl px-12">Find Now</button>

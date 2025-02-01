@@ -7,7 +7,7 @@ import UseCases from "../components/Landing/UseCases";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col text-secondary bg-complementary">
+    <main className="flex min-h-screen flex-col ">
       <Hero></Hero>
       <Features></Features>
       <UseCases></UseCases>
