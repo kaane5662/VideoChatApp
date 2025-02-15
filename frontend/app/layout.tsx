@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Inter, Outfit,Rubik,Jost,Space_Grotesk, Ubuntu,DM_Sans } from "next/font/google";
+import { Inter, Outfit,Rubik,Jost,Space_Grotesk, Ubuntu,DM_Sans,Poppins } from "next/font/google";
 
 import "./globals.css";
 import { UserProvider } from "./providers/UserContext";
 
-const dm_sans = DM_Sans({ subsets: ["latin"] });
+const poppins = Poppins({ subsets: ["latin"],weight:"400" });
 
 
 export const metadata: Metadata = {
@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html>
-      <body className={` max-top bg-complementary text-primary ${dm_sans.className}`}>
+      <body className={` max-top bg-complementary text-primary ${poppins.className}`}>
         {/* <UserProvider> */}
           {children}
       {/* </UserProvider> */}

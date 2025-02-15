@@ -14,7 +14,7 @@ export default async function PlatformNavbar(){
 
     return(
         <main className="flex flex-col j max-h-screen min-w-[15%] pt-12 bg-slate-50  border-r-2 text-primary  ">
-                <h1 className="text-2xl font-bold p-4 flex-col flex items-center gap-2"><img className=" w-16 h-fit" src="/Logo.png"></img> TECHMATCH</h1>
+                <h1 className="text-2xl font-bold p-4 flex-col flex items-center gap-2"><img className=" w-16 h-fit" src="/Logo.png"></img> Techmatch</h1>
                 <div className="flex gap-2 rounded-t-xl p-4 flex-col px-8 ">
                     {/* <div className="w-fit h-fit relative">
                         <img className="h-12 w-12    bg-secondary rounded-full">
