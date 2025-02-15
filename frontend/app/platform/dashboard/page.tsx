@@ -7,11 +7,12 @@ import ActivityCard from "../../components/dashboard/ActivityCard";
 import { BsFillCameraVideoFill } from "react-icons/bs";
 import { profile } from "console";
 import ProfileHeader from "../../components/profiles/ProfileHeader";
+import { redirect } from "next/navigation";
 
 export default async function Dashboard(){
     const Profile:IProfile = await getMyProfile(cookies().toString());
     const ReccomendedProfiles:IProfile[] = await getSimilarProfiles2(cookies().toString());
-    
+    if(Profile == null) return redirect("/platform/profile")
     return(
         <main className="  min-h-screen p-12 gap-8 flex flex-col ">
             {/* <Navbar></Navbar> */}

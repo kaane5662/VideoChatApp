@@ -4,6 +4,8 @@ import Features from "../components/Landing/Features";
 import CTA from "../components/Landing/CTA";
 import UseCase from "../components/Landing/UseCase";
 import UseCases from "../components/Landing/UseCases";
+import FAQ from "../components/Landing/FAQ";
+import Pricing from "../components/Landing/Pricing";
 
 export default function Home() {
   return (
@@ -11,6 +13,8 @@ export default function Home() {
       <Hero></Hero>
       <Features></Features>
       <UseCases></UseCases>
+      <Pricing></Pricing>
+      <FAQ></FAQ>
       <CTA></CTA>
     </main>
   );

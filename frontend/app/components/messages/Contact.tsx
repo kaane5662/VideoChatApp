@@ -7,9 +7,9 @@ export default function Contact({directMessage}:{directMessage:IDirectMessage}){
     return(
 
     <div onClick={()=>router.push(`/platform/messages/${directMessage.roomId}`)} className="flex gap-4 hover:bg-opacity-10 hover:cursor-pointer duration-300 hover:bg-secondary bg-white">
-        <img className="h-14 w-14 rounded-full bg-secondary self-center"></img>
-        <div className="flex  border-y p-4 w-full">
-            
+        
+        <div className="flex gap-4  border-y p-4 w-full">
+        <img className="h-8 w-8 rounded-full bg-secondary"></img>
             <div className="flex-col gap-2 flex">
                 <h3 className="text-xl font-bold">{directMessage.profileName}</h3>
                 <p className="text-md  text-slate-500">{directMessage.recentText}</p>

@@ -5,6 +5,7 @@ import { getSimilarProfiles } from "../../services/profiles";
 import { IProfile } from "../../interfaces";
 import ProfileBanner from "../../components/profiles/ProfileBanner";
 import ProfileHeader from "../../components/profiles/ProfileHeader";
+import { redirect } from "next/navigation";
 
 export default function Tailored(){
     const [Profiles,setProfiles]  = useState<IProfile[]>([])
@@ -21,6 +22,8 @@ export default function Tailored(){
     useEffect(()=>{
         getMatchingProfiles()
     },[])
+
+    if(Profiles == null) redirect("/platform/profile")
     //convert to server component
     return(
         <main className="  min-h-screen p-12 gap-8 flex flex-col ">

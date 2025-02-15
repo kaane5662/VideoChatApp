@@ -102,8 +102,12 @@ namespace Services {
                 using (var scope = _serviceProvider.CreateScope())
                 {
                     var dbContext = scope.ServiceProvider.GetRequiredService<MyDBContext>();
-                    await Task.Delay(500);
-                    if(_userTasks.IsEmpty) continue;
+                    
+                    if(_userTasks.IsEmpty || _userTasks.Count <=1) {
+                        await Task.Delay(2000);
+                        continue;
+                    }
+                    await Task.Delay(5);
                     _userTasks.TryDequeue(out var current);
                     if(current.Retires <= 0) {
                         await _hubContext.Clients.Client(current.ConnectionId).SendAsync("onError","Failed to join room",405);

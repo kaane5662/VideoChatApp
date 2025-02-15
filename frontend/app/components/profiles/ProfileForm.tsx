@@ -87,11 +87,11 @@ export default function ProfileForm({ProfileData}:{ProfileData:IProfile}){
                     <div className="grid grid-cols-2 gap-4">
                         <div className="col-span-1 flex flex-col gap-2">
                             <label className="text-sm text-black text-opacity-60 ">First Name</label>
-                            <input onChange={(e)=>setProfile({...Profile,["firstName"]:e.target.value})} defaultValue={Profile?.firstName} name="firstName" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 "></input>
+                            <input placeholder="Enter first name" onChange={(e)=>setProfile({...Profile,["firstName"]:e.target.value})} defaultValue={Profile?.firstName} name="firstName" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 "></input>
                         </div>
                         <div className="col-span-1 flex flex-col gap-2">
                             <label className="text-sm text-black text-opacity-60 ">Last Name</label>
-                            <input onChange={(e)=>setProfile({...Profile,["lastName"]:e.target.value})} defaultValue={Profile?.lastName} name="lastName" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 "></input>
+                            <input placeholder="Enter last name" onChange={(e)=>setProfile({...Profile,["lastName"]:e.target.value})} defaultValue={Profile?.lastName} name="lastName" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 "></input>
                         </div>
                         
                         <div className="flex flex-col gap-2 col-span-2">
@@ -135,19 +135,19 @@ export default function ProfileForm({ProfileData}:{ProfileData:IProfile}){
                     <div className="grid grid-cols-1 gap-4">
                         <div className="col-span-1 flex flex-col gap-2">
                             <label className="text-sm text-black text-opacity-60 ">Github URL</label>
-                            <input onChange={(e)=>setProfile({...Profile,["githubUrl"]:e.target.value})} defaultValue={Profile?.githubUrl} name="firstName" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 "></input>
+                            <input placeholder="github.com/username" onChange={(e)=>setProfile({...Profile,["githubUrl"]:e.target.value})} defaultValue={Profile?.githubUrl} name="firstName" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 "></input>
                         </div>
                         <div className="col-span-1 flex flex-col gap-2">
                             <label className="text-sm text-black text-opacity-60 ">LinkedIn URL</label>
-                            <input onChange={(e)=>setProfile({...Profile,["linkedInUrl"]:e.target.value})} defaultValue={Profile?.linkedInUrl} name="lastName" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 "></input>
+                            <input placeholder="linkedin.com/" onChange={(e)=>setProfile({...Profile,["linkedInUrl"]:e.target.value})} defaultValue={Profile?.linkedInUrl} name="lastName" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 "></input>
                         </div>
                         <div className="col-span-1 flex flex-col gap-2">
                             <label className="text-sm text-black text-opacity-60 ">Twitter URL</label>
-                            <input onChange={(e)=>setProfile({...Profile,["twitterUrl"]:e.target.value})} defaultValue={Profile?.twitterUrl} name="lastName" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 "></input>
+                            <input placeholder="x.com/username" onChange={(e)=>setProfile({...Profile,["twitterUrl"]:e.target.value})} defaultValue={Profile?.twitterUrl} name="lastName" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 "></input>
                         </div>
                         <div className="col-span-1 flex flex-col gap-2">
                             <label className="text-sm text-black text-opacity-60 ">Portfolio URL</label>
-                            <input onChange={(e)=>setProfile({...Profile,["portfolioUrl"]:e.target.value})} defaultValue={Profile?.portfolioUrl} name="lastName" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 "></input>
+                            <input placeholder="Enter your portfolio url" onChange={(e)=>setProfile({...Profile,["portfolioUrl"]:e.target.value})} defaultValue={Profile?.portfolioUrl} name="lastName" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 "></input>
                         </div>
                         
                        
@@ -163,7 +163,7 @@ export default function ProfileForm({ProfileData}:{ProfileData:IProfile}){
             <div className="flex flex-col gap-4">
                 <div className="col-span-2 flex flex-col gap-4 p-6 bg-white rounded-md border-2">
                     <label className="text-xl font-bold ">Bio</label>
-                    <textarea onChange={(e)=>setProfile({...Profile,["description"]:e.target.value})} defaultValue={Profile?.description} name="description" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 h-[100px] "></textarea>
+                    <textarea placeholder="Aspiring software engineer trying to build a fintech startup" onChange={(e)=>setProfile({...Profile,["description"]:e.target.value})} defaultValue={Profile?.description} name="description" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 h-[100px] "></textarea>
                 </div>
                 <div className="flex flex-col gap-4 col-span-2 bg-white p-6 rounded-md border-2">
                     <label className="text-xl font-bold ">Frameworks</label>

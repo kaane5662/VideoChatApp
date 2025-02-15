@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html>
-      <body className={` bg-complementary text-primary ${dm_sans.className}`}>
+      <body className={` max-top bg-complementary text-primary ${dm_sans.className}`}>
         {/* <UserProvider> */}
           {children}
       {/* </UserProvider> */}

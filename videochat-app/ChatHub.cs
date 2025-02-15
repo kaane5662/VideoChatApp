@@ -102,6 +102,7 @@ namespace SignalRChat {
         }
 
         public async Task JoinPool(){
+            Console.WriteLine(Context.ConnectionId+" joined pool");
             string IdentityUserId = Context.GetHttpContext().Items["UserId"]?.ToString();
             await _pcProfiles.UpdateAsync(new UpdateRequest{
                 Id = IdentityUserId,
@@ -238,7 +239,7 @@ namespace SignalRChat {
 
         public override async Task OnConnectedAsync()
         {
-            // Console.WriteLine($"Connected: {Context.ConnectionId}");
+            Console.WriteLine($"Connected: {Context.ConnectionId}");
             string IdentityUserId = Context.GetHttpContext().Items["UserId"]?.ToString();
             
             _connections[IdentityUserId] = Context.ConnectionId;

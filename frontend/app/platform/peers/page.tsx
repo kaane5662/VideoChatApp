@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useRef, useState } from "react";
 import * as signalR from '@microsoft/signalr';
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { FaCamera, FaMicrophone, FaMicrophoneSlash, FaPhoneSlash } from "react-icons/fa";
 import { IoExit } from "react-icons/io5";
 import { BiVolume, BiVolumeLow } from "react-icons/bi";
@@ -11,9 +11,12 @@ import Chat from "@/app/components/video/Chat";
 import { IProfile, IVideoChat } from "@/app/interfaces";
 import InitDm from "@/app/components/messages/InitDm";
 import Intro from "@/app/components/video/Intro";
+import { ImSpinner8 } from "react-icons/im";
+import Router from 'next/router';
 
 export default function Peers(){
     // const {id} = useParams()
+  
     const localVideoRef = useRef<HTMLVideoElement>(null);
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const streamRef = useRef<MediaStream | null>(null)
@@ -34,6 +37,34 @@ export default function Peers(){
         iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
     }
 
+    // useEffect(() => {
+    //     if (!connection || typeof window === 'undefined') return;
+    
+    //     const handleRouteChange = (url: string) => {
+    //       if (!url.includes('/platform/peers') && connection.state === 'Connected') {
+    //         connection.stop()
+    //           .then(() => console.log('SignalR Disconnected - route changed'))
+    //           .catch(err => console.error('Disconnection error:', err));
+    //       }
+    //     };
+    
+    //     // Initial check
+    //     if (!window.location.pathname.includes('/platform/peers') && connection.state === 'Connected') {
+    //       connection.stop()
+    //         .then(() => console.log('SignalR Disconnected - not on peers page'))
+    //         .catch(err => console.error('Disconnection error:', err));
+    //     }
+    
+    //     Router.events.on('routeChangeStart', handleRouteChange);
+    
+    //     return () => {
+    //       Router.events.off('routeChangeStart', handleRouteChange);
+    //       if (connection.state === 'Connected') {
+    //         connection.stop()
+    //           .catch(err => console.error('Cleanup error:', err));
+    //       }
+    //     };
+    //   }, [connection]);
 
     const createOffer = async ()=>{
         console.log("Creating offer")
@@ -65,11 +96,9 @@ export default function Peers(){
 
     }
 
-    const initSignalR = async () => {
-        const hubConnection = new signalR.HubConnectionBuilder()
-          .withUrl(`${process.env.NEXT_PUBLIC_BASE_URL}/chatHub`,{withCredentials:true})
-          .configureLogging(signalR.LogLevel.Information)
-          .build();
+    const initSignalR = async (hubConnection:signalR.HubConnection) => {
+        
+        setConnection(hubConnection);
 
         hubConnection.on('RoomJoined', async()=>{
             joiningRoom.current = false
@@ -148,6 +177,8 @@ export default function Peers(){
 
         hubConnection.on('onError',async(message,code)=>{
             console.log(message, code)
+            console.log("reattempting")
+            if(code == 405) connection?.invoke("JoinRoom")
         })
         hubConnection.on('messageRecieved',async(sender:string, message:string)=>{
             console.log(sender)
@@ -157,8 +188,8 @@ export default function Peers(){
 
         
   
-        await hubConnection.start().then(() => {setConnection(hubConnection); });
-        setConnection(hubConnection)
+        await hubConnection.start();
+        console.log(hubConnection.state)
         
 
     };
@@ -174,6 +205,11 @@ export default function Peers(){
         console.log("on camera change")
         if (streamRef.current) {
             const videoTrack = streamRef.current.getVideoTracks()[0];
+            streamRef.current.getTracks().forEach(track => {
+                track.stop();
+                streamRef?.current?.removeTrack(track);
+              });
+      
             if (videoTrack) {
                 // Toggle the enabled state
                 videoTrack.enabled = !videoTrack.enabled;
@@ -241,8 +277,17 @@ export default function Peers(){
     
     useEffect(()=>{
         console.log("Initialized")
-        initSignalR()
-        return()=>{connection?.stop()}
+        const hubConnection = new signalR.HubConnectionBuilder()
+          .withUrl(`${process.env.NEXT_PUBLIC_BASE_URL}/chatHub`,{withCredentials:true})
+          .configureLogging(signalR.LogLevel.Information)
+          .build();
+        initSignalR(hubConnection)
+        return()=>{
+            console.log("Connection state: ",hubConnection.state)
+            console.log("Unmounted component")
+            if(hubConnection.state == signalR.HubConnectionState.Disconnected || hubConnection.state == signalR.HubConnectionState.Connecting) return
+            hubConnection.stop().then(()=>console.log("Disconnected session"))
+        }
     },[])
 
     if(!joinedSession){
@@ -281,7 +326,10 @@ export default function Peers(){
                 
             </div>
             ):(
-                <h1 className="w-full">Finding the perfect match for you...</h1>
+                <div className="flex p-12 gap-4 flex-col w-full">
+                    <p>Finding your perfect match</p>
+                    <ImSpinner8 className="text-secondary animate-spin" size={20}></ImSpinner8>
+                </div>
             )}
             <Chat connectedProfile={ConnectedProfile} sendMessage={sendMessage} messages={messages}/>
             

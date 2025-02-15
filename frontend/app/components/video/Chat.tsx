@@ -27,8 +27,10 @@ export default function Chat({messages,sendMessage, connectedProfile}:{messages:
 
                     {messages.map((message:IVideoChat,index:number)=>{
                         return(
-                            
-                                <p key={index} className={`p-1 px-4 w-fit rounded-xl text-sm ${message.isSender ? "bg-secondary text-white": "bg-slate-200 self-end"}`}>{message.message}</p>
+                                <div className={`flex flex-col gap-1 ${!message.isSender && "self-end"}`}>
+                                    <label className="text-xs text-slate-500">{message.isSender? "You":connectedProfile?.firstName}</label>
+                                    <p key={index} className={`p-1 px-4 w-fit rounded-xl text-sm ${message.isSender ? "bg-secondary text-white": "bg-slate-200 self-end"}`}>{message.message}</p>
+                                </div>
                             
                         )
                     })}

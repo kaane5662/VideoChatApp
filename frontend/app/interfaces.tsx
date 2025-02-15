@@ -56,3 +56,10 @@ export interface IMessage{
     fromProfileId:number,
     id:number
 }
+export interface IUser{
+    email:string,
+    stripeCustomerId?:string,
+    subscribed:Boolean,
+    annualPlan:Boolean,
+    id:string
+}

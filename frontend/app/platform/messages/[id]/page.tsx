@@ -153,8 +153,8 @@ export default function MessageThread({params}:any){
         if (messagesEndRef.current) {
             const container = messagesEndRef.current;
             console.log(container.scrollTop, container.scrollHeight)
-            if(container.scrollTop -400 >= container.scrollHeight )
-                container.scrollTop = container.scrollHeight;
+            container.scrollTop = container.scrollHeight;
+            
         }
       }, [Messages]);
 
@@ -176,11 +176,14 @@ export default function MessageThread({params}:any){
     return(
         <main className="flex flex-col justify-between h-full">
             <div className="flex gap-4 w-full border-y-2 p-2">
-                <img className="h-14 w-14 self-center bg-secondary rounded-full">
-                </img>
+                <div className="relative h-fit">
+                    <img className="h-8 w-8 bg-secondary rounded-full"/>
+                  
+
+                </div>
                 <div className="flex flex-col gap-0">
                         <h1 className="font-semibold text-xl">{OtherProfile.firstName+" "+OtherProfile.lastName}</h1> 
-                    <p className="text-md text-opacity-50 text-secondary">{OtherProfile.industry}</p> 
+                    <p className="text-sm text-slate-500">{OtherProfile.industry}</p> 
 
                 </div>
             </div>

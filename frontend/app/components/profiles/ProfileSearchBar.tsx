@@ -5,10 +5,10 @@ import { constants } from "@/app/helpers/constants";
 export default function ProfileSearchBar({updateResults}:{updateResults:Function}){
     
     return(
-        <div className="  p-12 gap-2 flex flex-col rounded-xl border-b-2 w-full ">
+        <div className="  p-12 gap-2 flex flex-col rounded-md border-b-2 w-full  ">
             <h1 className="text-4xl font-bold">Find Your Perfect Co-Founder!</h1>
             <h2 className="text-black text-opacity-50 text-md">Search profiles tailored to your business needs.</h2>
-            <div className="grid grid-cols-5 gap-4 pt-4">
+            <div className="grid grid-cols-5 gap-2 pt-4">
                 <div className="flex flex-col gap-2 col-span-2  ">
                     
                     {/* <label className="text-sm text-black text-opacity-60 ">Industry </label> */}

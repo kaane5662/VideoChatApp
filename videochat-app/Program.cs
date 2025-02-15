@@ -15,7 +15,7 @@ using Services;
 using DotNetEnv;
 using AspNet.Security.OAuth.GitHub;
 using Microsoft.AspNetCore.Authentication.Cookies;
-
+using Stripe;
 Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
@@ -122,7 +122,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+StripeConfiguration.ApiKey=builder.Configuration["Stripe:SecretKey"];
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors(MyAllowSpecificOrigins);
