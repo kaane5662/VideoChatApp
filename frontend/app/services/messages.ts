@@ -1,7 +1,7 @@
 import axios, { Axios, AxiosError } from "axios"
-export async function getDirectMessages(cookie:string) {
+export async function getDirectMessages(cookie:string,threads:number=-1) {
     try{
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/messages`,{ headers: { Cookie: cookie }})
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/messages?threads=${threads}`,{ headers: { Cookie: cookie }})
         console.log(res.data)
         
         return res.data

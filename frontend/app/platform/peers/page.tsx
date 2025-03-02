@@ -1,8 +1,8 @@
 "use client"
 import { useEffect, useRef, useState } from "react";
 import * as signalR from '@microsoft/signalr';
-import { useParams, usePathname } from "next/navigation";
-import { FaCamera, FaMicrophone, FaMicrophoneSlash, FaPhoneSlash } from "react-icons/fa";
+import { redirect, useParams, usePathname, useRouter } from "next/navigation";
+import { FaCamera, FaMagic, FaMicrophone, FaMicrophoneSlash, FaPhoneSlash } from "react-icons/fa";
 import { IoExit } from "react-icons/io5";
 import { BiVolume, BiVolumeLow } from "react-icons/bi";
 import { BsCamera, BsCameraVideo, BsCameraVideoFill, BsCameraVideoOff, BsFillCameraVideoOffFill } from "react-icons/bs";
@@ -13,10 +13,12 @@ import InitDm from "@/app/components/messages/InitDm";
 import Intro from "@/app/components/video/Intro";
 import { ImSpinner8 } from "react-icons/im";
 import Router from 'next/router';
+import { toast } from "react-toastify";
+import AcceptMatch from "@/app/components/popups/AcceptMatch";
 
 export default function Peers(){
     // const {id} = useParams()
-  
+    const router = useRouter()
     const localVideoRef = useRef<HTMLVideoElement>(null);
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
     const streamRef = useRef<MediaStream | null>(null)
@@ -25,6 +27,8 @@ export default function Peers(){
     const [ConnectedProfile, setConnectedProfile] = useState<IProfile | null>(null)
     const peerConnection= useRef<RTCPeerConnection | null>(null);
     
+    const [displayMatch,setDisplayMatch] = useState(false)
+    const [matched,setMatched] = useState(false)
 
     const [muted, setMuted] = useState(true)
     const [videoToggled, setVideoToggled] = useState(false)
@@ -174,15 +178,33 @@ export default function Peers(){
             console.log("left room")
             joinRoom()
         })
-
-        hubConnection.on('onError',async(message,code)=>{
+        
+        hubConnection.on('onError',async(message,code,redirect=true)=>{
             console.log(message, code)
+            toast.error(message)
+            
             console.log("reattempting")
-            if(code == 405) connection?.invoke("JoinRoom")
+            if(code == 405) 
+                await joinRoom()
+            if(code == 403){
+                if(redirect)
+                    router.replace("/platform/settings?displayPlans=yes")
+                // setJoinedSession(false);
+            }
+
+            
         })
         hubConnection.on('messageRecieved',async(sender:string, message:string)=>{
             console.log(sender)
             setMessages((prevMessages) => [...prevMessages, {message:message, isSender:false}]);
+        })
+        hubConnection.on('sendMatch',async(sender:string, message:string)=>{
+            setDisplayMatch(true)
+        })
+        hubConnection.on('onMatch',async()=>{
+            setDisplayMatch(false)
+            toast.success("Peer is now a match")
+            setMatched(true)
         })
 
 
@@ -267,13 +289,35 @@ export default function Peers(){
             
         })
     }
+
+    const sendMatch = async()=>{
+        if(!connection && !peerConnection) return toast.error("No connection with another peer")
+        if(!ConnectedProfile) return toast.error("Not connected to another profile")
+        toast.success("Sent match request")
+        
+        connection?.invoke("SendMatchRequest")
+    }
+    const acceptMatchRequest = async()=>{
+        if(!connection && !peerConnection) return toast.error("No connection with another peer")
+        if(!ConnectedProfile) return toast.error("Not connected to another profile")
+        connection?.invoke("AcceptMatchRequest",ConnectedProfile.identityUserId)
+        setDisplayMatch(false)
+    }
   
 
 
     useEffect(()=>{
         if(!connection) return
         createOffer()
+        return()=>{
+            endSession()
+        }
     },[muted,videoToggled])
+
+    useEffect(()=>{
+        if(ConnectedProfile)
+            setMatched(false)
+    },[ConnectedProfile])
     
     useEffect(()=>{
         console.log("Initialized")
@@ -285,8 +329,11 @@ export default function Peers(){
         return()=>{
             console.log("Connection state: ",hubConnection.state)
             console.log("Unmounted component")
+            setVideoToggled(false)
             if(hubConnection.state == signalR.HubConnectionState.Disconnected || hubConnection.state == signalR.HubConnectionState.Connecting) return
             hubConnection.stop().then(()=>console.log("Disconnected session"))
+            
+
         }
     },[])
 
@@ -300,6 +347,7 @@ export default function Peers(){
     return(
         <main className=" p-12 flex gap-8 h-screen bg-slate-50">
             {/* <h1 className="text-sm font-semibold text-black">Room Id: <span className="text-opacity-50 text-black font-normal">{id}</span></h1> */}
+            {displayMatch && <AcceptMatch onAcceptMatch={acceptMatchRequest} onSetShow={setDisplayMatch}/>}
             {ConnectedProfile ? (
                
             <div className="gap-8 relative self-center h-fit w-[1000px] rounded-sm">
@@ -331,9 +379,11 @@ export default function Peers(){
                     <ImSpinner8 className="text-secondary animate-spin" size={20}></ImSpinner8>
                 </div>
             )}
-            <Chat connectedProfile={ConnectedProfile} sendMessage={sendMessage} messages={messages}/>
+            <div className="flex flex-col gap-2  h-full w-[30%] ">
+                <Chat connectedProfile={ConnectedProfile} sendMessage={sendMessage} messages={messages}/>
+                <button disabled={matched} onClick={sendMatch} className="p-2 w-full justify-center rounded-xl px-4 bg-secondary text-white disabled:bg-opacity-30 flex gap-2 items-center duration-300 hover:opacity-50"><FaMagic size={12}/>Match </button>
+            </div>
             
-
 
         </main>
     )

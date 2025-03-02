@@ -7,8 +7,11 @@ import axios from "axios";
 import { searchProfiles } from "../../services/profiles";
 import ProfileHeader from "../../components/profiles/ProfileHeader";
 import Pagination from "@/app/components/ui/Pagination";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export default function Search(){
+    const router = useRouter()
     const [Profiles, setProfiles] = useState<IProfile | any>([])
     const [searchObject, setSearchObject] = useState<IProfileSearch | any>()
     const [currentPage,setCurrentPage] = useState(1);
@@ -23,17 +26,27 @@ export default function Search(){
         setSearchObject(newSearchObject)
         console.log(newSearchObject)
         const query:string = createSearchParams(newSearchObject)
-        const results = await searchProfiles(query);
-        console.log(results)
-        setProfiles(results.paginatedResults)
-        setMaxPages(results.count)
+        try{
+            const results = await searchProfiles(query);
+
+            setProfiles(results.paginatedResults)
+            setMaxPages(results.count)
+        }catch(error:any){
+            console.log(error)
+            toast.error(error?.response?.data || "Unexpected error has occured")
+            if(error?.status == 403)
+                router.push("/platform/settings?displayPlans=yes")
+            
+
+        }
+        
     };
 
     useEffect(()=>{
         fetchResults([],"avaliability")
     },[currentPage])
     return(
-        <main className="  min-h-screen gap-12 flex flex-col">
+        <main className="  min-h-screen gap-4 py-4 flex flex-col">
             <ProfileSearchBar updateResults={fetchResults}/>
             <div className="grid grid-cols-3 gap-8 px-12">
                 {Profiles?.map((profile:IProfile)=>{

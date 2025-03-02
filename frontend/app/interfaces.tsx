@@ -46,7 +46,8 @@ export interface IDirectMessage{
     recentCreatedAt:string,
     profileName:string,
     profileIndustry: string,
-    profileId: number
+    profileId: number,
+    type:string
 }
 
 export interface IMessage{

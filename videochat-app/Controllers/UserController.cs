@@ -19,15 +19,17 @@ using System.Text.Json;
 [ApiController]
 public class UserController : ControllerBase {
     private readonly MyDBContext _context;
+    private readonly IDbContextFactory<MyDBContext> _contextFactory;
     private readonly IConfiguration _configuration;
     private readonly JwtHelper _jwtHelper;
     private readonly UserHelper _userHelper;
 
-    public UserController(MyDBContext context, IConfiguration configuration, JwtHelper jwtHelper, UserHelper userHelper) {
+    public UserController(MyDBContext context, IConfiguration configuration, JwtHelper jwtHelper, UserHelper userHelper, IDbContextFactory<MyDBContext> contextFactory) {
         _context = context;
         _configuration = configuration;
         _jwtHelper = jwtHelper;
         _userHelper = userHelper;
+        _contextFactory = contextFactory;
     }
 
     [HttpPost("")]
@@ -104,6 +106,7 @@ public class UserController : ControllerBase {
             
             Response.Cookies.Append("token","", new CookieOptions{});
             Response.Cookies.Append("test","jkrtkljklrtklhrtklhrtlkjlk", new CookieOptions{});
+            Response.Cookies.Delete("token");
             Console.WriteLine("Logging out");
             return Ok();
         }catch(Exception err){
@@ -115,16 +118,38 @@ public class UserController : ControllerBase {
     [HttpGet("")]
     public async Task<IActionResult> GetUser(){
         Console.WriteLine("Inside the authorized route");
-        if(HttpContext.Items.TryGetValue("UserId", out var userId)){
-            Console.WriteLine("Token: ",userId);
-            var user = await _context.Users.FirstAsync(u=> u.Id == (string) userId);
-            if(user == null) return NotFound();
-            return Ok(user);    
-        }
+        try{
 
-        return Forbid();
+            HttpContext.Items.TryGetValue("UserId", out var userId);
+            Console.WriteLine("Token: ",userId);
+            var user = await _context.Users.FirstAsync(u=> u.Id == (string) userId);       
+            if(user == null) return NotFound();
+            Console.WriteLine("Days:"+(DateTime.Now-user.CreditsRenew).Days);
+            if((DateTime.UtcNow-user.CreditsRenew).Days >= 30){
+                user.Credits = 50;
+                user.CreditsRenew = DateTime.UtcNow;
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+            }
+            if((DateTime.UtcNow-user.MatchesRenew).Days >= 30){
+                user.Matches=3;
+                user.MatchesRenew = DateTime.UtcNow;
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+            }
+            return Ok(user);    
+        }catch(Exception err){
+            Console.WriteLine(err);
+            return BadRequest(err.Message);
+        }
+        
+
+        
     }
 
+    
+
+    
     // Redirect to Google login page
     [HttpGet("google")]
     public IActionResult GoogleLogin()

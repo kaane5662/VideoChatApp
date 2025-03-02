@@ -55,6 +55,23 @@ export async function signOut(cookie:string){
     }  
 }
 
+export async function getUser2(cookie:string){
+    // "use server"
+    console.log("Logging out")
+    console.log(cookie)
+    try{
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/user`,
+            { headers: { Cookie: cookie }})
+        // redirect("/login")
+        console.log(res.data)
+        return res.data
+    }catch(error:any){
+        console.log(error.message)
+        throw new Error(error?.response?.data?.message || "Unexpected error has occured")
+    }  
+}
+
 export async function googleOAuth(){ 
     window.location.href = `http://localhost:3000/api/user/auth/go`       
 }
+

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using System.Text.Json;
 using System.Runtime.InteropServices;
+using videochat_app.Migrations;
 
 [Authorize]
 [Route("/api/[controller]")]
@@ -27,39 +28,35 @@ public class MessagesController : ControllerBase {
     }
     [HttpGet("")]
    
-    public async Task<IActionResult> GetDirectMessages() {
+    public async Task<IActionResult> GetDirectMessages([FromQuery] int threads=-1) {
         
         try{
             string IdentityUserId = HttpContext.Items["UserId"]?.ToString();
             Console.WriteLine("Im getting the direct messages");
             var profile = await _context.Profiles.FirstAsync(p=>p.IdentityUserId == IdentityUserId);
-            var dms =  await (
+            var dmsQuery =  (
             from dm in _context.DirectMessages
-            join p in _context.Profiles
-            on dm.Profile1Id == profile.Id ? dm.Profile2Id : dm.Profile1Id equals p.Id
-            join m in _context.Messages
-            on dm.Id equals m.DirectMessageId
             where dm.Profile1Id == profile.Id || dm.Profile2Id == profile.Id
-            orderby m.CreatedAt descending
-            group new{dm,p,m} by dm.Id into groupedDms
-            
-            
-            // group new{dm,m,p} by m.Id into groupedMessages
-            // where groupedMessages.Any()
-            // let latestMessage = groupedMessages
-            // .OrderByDescending(g => g.m.CreatedAt)
-            // .FirstOrDefault()
+            let contactId = (dm.Profile1Id == profile.Id) ? dm.Profile2Id : dm.Profile1Id
+            join p in _context.Profiles on contactId equals p.Id
+            join m in _context.Messages on dm.Id equals m.DirectMessageId into messageGroup
+            let lastMessage = messageGroup.OrderByDescending(m => m.CreatedAt).FirstOrDefault()
             select new { 
-                RoomId=groupedDms.FirstOrDefault().dm.Id,
-                RecentText = groupedDms.FirstOrDefault().m.Text,
-                RecentCreatedAt = groupedDms.FirstOrDefault().m.CreatedAt,
-                ProfileId = groupedDms.FirstOrDefault().p.Id,
-                ProfileName = groupedDms.FirstOrDefault().p.FirstName,
-                ProfileIndustry = groupedDms.FirstOrDefault().p.Industry
+                RoomId=dm.Id,
+                RecentText =  lastMessage.Text,
+                RecentCreatedAt = lastMessage.CreatedAt,
+                ProfileId = p.Id,
+                ProfileName = p.FirstName,
+                ProfileIndustry = p.Industry,
+                Type=dm.Type != null ? dm.Type: "Cold"
             }
-            ).ToListAsync();
-            Console.WriteLine("Done getting the direct messages"+dms);
-            return Ok(dms);
+            );
+            if(threads > -1)
+                dmsQuery.Take(threads);
+            var dmsRes = await dmsQuery.ToListAsync();
+            
+            Console.WriteLine("Done getting the direct messages"+dmsRes);
+            return Ok(dmsRes);
         }catch(Exception err){
             Console.WriteLine(err.ToString());
             return BadRequest(err.Message);
@@ -75,9 +72,9 @@ public class MessagesController : ControllerBase {
             if(validDm == null) return Forbid();
             var messages =  await (
                 from m in _context.Messages
+                where m.DirectMessageId == id
                 join p in _context.Profiles
                 on m.FromProfileId equals p.Id
-                where m.DirectMessageId == id
                 // orderby m.CreatedAt descending
                 
                 select new {
@@ -104,9 +101,9 @@ public class MessagesController : ControllerBase {
             if(validDm == null) return Forbid();
             var messages =  await (
                 from m in _context.Messages
+                where m.DirectMessageId == id && m.CreatedAt < date
                 join p in _context.Profiles
                 on m.FromProfileId equals p.Id
-                where m.DirectMessageId == id && m.CreatedAt < date
                 orderby m.CreatedAt descending
                 
                 select new {
@@ -126,6 +123,7 @@ public class MessagesController : ControllerBase {
         }
     }
 
+    
     [HttpPost("")]
     
     public async Task<IActionResult> CreateDirectMessageThread([FromBody] Dictionary<string, int> request) {
@@ -133,11 +131,17 @@ public class MessagesController : ControllerBase {
             Console.WriteLine(request);
             if(request["targetProfileId"] == null) return NotFound();
             string IdentityUserId = HttpContext.Items["UserId"]?.ToString();
+            var otherProfileId = request["targetProfileId"];
+            var user = _context.Users.First(u=>u.Id==IdentityUserId);
+            if(!user.Subscribed)
+                return Forbid("Cold messaging requires a subscription");
             var profile = await _context.Profiles.FirstAsync(p=>p.IdentityUserId == IdentityUserId);
-            var existingDm = await _context.DirectMessages.FirstOrDefaultAsync(dm=> dm.Profile1Id == profile.Id || dm.Profile2Id == profile.Id);
-            Console.WriteLine("Past the thing",existingDm,request["targetProfileId"]);
+            var existingDm = await _context.DirectMessages.FirstOrDefaultAsync(dm=> 
+            (dm.Profile1Id == profile.Id && dm.Profile2Id == otherProfileId) || (dm.Profile1Id == otherProfileId && dm.Profile2Id == profile.Id)
+            );
+            Console.WriteLine("Past the thing",existingDm,otherProfileId);
             if(existingDm == null) {
-                var newDm = new DirectMessage {Profile1Id=profile.Id, Profile2Id=request["targetProfileId"]};
+                var newDm = new DirectMessage {Profile1Id=profile.Id, Profile2Id=otherProfileId};
                 await _context.DirectMessages.AddAsync(newDm);
                 await _context.SaveChangesAsync();
                 return Ok(newDm.Id);
@@ -190,31 +194,6 @@ public class MessagesController : ControllerBase {
 
     
 
-    // [HttpPost]
-    // public async Task<IActionResult> CreateDirectMessageThreadWith([FromBody] Dictionary<string, int> request) {
-    //     try{
-    //         Console.WriteLine(request);
-    //         var text = request["message"];
-    //         var targetProfileId = request["targetProfileId"];
-    //         if(targetProfileId == null) return NotFound();
-    //         string IdentityUserId = HttpContext.Items["UserId"]?.ToString();
-    //         var profile = await _context.Profiles.FirstAsync(p=>p.IdentityUserId == IdentityUserId);
-    //         var existingDm = await _context.DirectMessages.FirstOrDefaultAsync(dm=> dm.Profile1Id == profile.Id || dm.Profile2Id == profile.Id);
-    //         Console.WriteLine("Past the thing",existingDm,request["targetProfileId"]);
-    //         if(existingDm == null) {
-    //             var newDm = new DirectMessage {Profile1Id=profile.Id, Profile2Id=request["targetProfileId"]};
-    //             await _context.DirectMessages.AddAsync(newDm);
-    //             await _context.SaveChangesAsync();
-    //             return Ok(new{RoomId = newDm.Id});
-    //             return Ok();
-    //         }else{
-    //             return Ok(existingDm.Id);
-    //         } 
-    //     }catch(Exception err){
-    //         Console.WriteLine(err.ToString());
-    //         return BadRequest(err.Message);
-    //     }
-    // }
-
+    
 
 }

@@ -14,11 +14,11 @@ export default async function MessagesPage(){
         <main className="p-16 flex flex-col gap-8 h-full ">
             <h1 className="font-bold text-4xl">Direct Messages</h1>
             <div className="flex flex-col">
-                {DirectMessages?.map((directMessage, index)=>{
+                {DirectMessages && DirectMessages.length > 0 ?DirectMessages?.map((directMessage, index)=>{
                     return(
                         <Contact directMessage={directMessage}></Contact>
                     )
-                })}
+                }):<p className="text-slate-500">No direct messages</p>}
             </div>
         </main>
 

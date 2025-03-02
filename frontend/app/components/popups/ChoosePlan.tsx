@@ -37,8 +37,9 @@ export default function ChoosePlan({onSetShow}:{onSetShow:Function}){
                         <h1 className="text-xl font-semibold">$5.99 per month</h1>
                         
                         <div className="flex flex-col gap-1 text-sm">
-                            <h1 className="flex gap-2 items-center"> <FaCheckCircle className="text-secondary"></FaCheckCircle> No video session limits</h1>
-                            <h1 className="flex gap-2 items-center"> <FaCheckCircle className="text-secondary"></FaCheckCircle> Unlimited direct messaging</h1>
+                            <h1 className="flex gap-2 items-center"> <FaCheckCircle className="text-secondary"></FaCheckCircle>Unlimited Video credits</h1>
+                            <h1 className="flex gap-2 items-center"> <FaCheckCircle className="text-secondary"></FaCheckCircle> Cold messaging</h1>
+                            <h1 className="flex gap-2 items-center"> <FaCheckCircle className="text-secondary"></FaCheckCircle> No match limit</h1>
                         </div>
                         <button onClick={()=>subscribe(false)} className="hover:opacity-70 duration-300 text-white bg-secondary p-2 rounded-xl">Subscribe</button>
                     </div>
@@ -48,8 +49,9 @@ export default function ChoosePlan({onSetShow}:{onSetShow:Function}){
                         <p className=" text-secondary border-2 bg-slate-100 font-semibold px-3 w-fit text-xs rounded-xl">Save 30%</p>
                         
                         <div className="flex flex-col gap-1 text-sm">
-                            <h1 className="flex gap-2 items-center"> <FaCheckCircle className="text-secondary"></FaCheckCircle> No video session limits</h1>
-                            <h1 className="flex gap-2 items-center"> <FaCheckCircle className="text-secondary"></FaCheckCircle> Unlimited direct messaging</h1>
+                            <h1 className="flex gap-2 items-center"> <FaCheckCircle className="text-secondary"></FaCheckCircle>Unlimited Video credits</h1>
+                            <h1 className="flex gap-2 items-center"> <FaCheckCircle className="text-secondary"></FaCheckCircle> Cold messaging</h1>
+                            <h1 className="flex gap-2 items-center"> <FaCheckCircle className="text-secondary"></FaCheckCircle> No match limit</h1>
                         </div>
                         <button onClick={()=>subscribe(true)} className="hover:opacity-70 duration-300 text-white bg-secondary p-2 rounded-xl">Subscribe</button>
                     </div>

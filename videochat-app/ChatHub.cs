@@ -104,6 +104,12 @@ namespace SignalRChat {
         public async Task JoinPool(){
             Console.WriteLine(Context.ConnectionId+" joined pool");
             string IdentityUserId = Context.GetHttpContext().Items["UserId"]?.ToString();
+            var user = await _context.Users.FirstOrDefaultAsync(u=>u.Id == IdentityUserId);
+            if(user.Credits <= 0 && !user.Subscribed){
+                Console.WriteLine(Context.ConnectionId+" rejected from pool");
+                await Clients.Client(Context.ConnectionId).SendAsync("onError","Not enough tokens",403);
+                return;
+            }
             await _pcProfiles.UpdateAsync(new UpdateRequest{
                 Id = IdentityUserId,
                 SetMetadata = new Pinecone.Metadata{
@@ -195,7 +201,54 @@ namespace SignalRChat {
             
         }
         
-        
+        public async Task AcceptMatchRequest(string targetUserId){
+            // accepted
+            Console.WriteLine("hello");
+            
+            string IdentityUserId = Context.GetHttpContext().Items["UserId"]?.ToString();
+            
+            
+            var profile1 = await _context.Profiles.FirstAsync(p=>p.IdentityUserId == IdentityUserId);
+            var profile2 = await _context.Profiles.FirstAsync(p=>p.IdentityUserId == targetUserId);
+            var dmExists = await _context.DirectMessages.FirstOrDefaultAsync(
+                dm=>( (dm.Profile1Id==profile1.Id && dm.Profile2Id == profile2.Id) || (dm.Profile1Id==profile2.Id && dm.Profile2Id == profile1.Id))
+            );
+            if(dmExists !=null){
+                await Clients.Group(_connectedRooms[Context.ConnectionId]).SendAsync("onError","Match already exits between peers",404,false);
+                return;
+            }
+                
+            var newDm = _context.DirectMessages.Add(new DirectMessage{
+                Profile1Id=profile1.Id,
+                Profile2Id=profile2.Id,
+                Type="match"
+            });
+            await _context.SaveChangesAsync();
+            Console.WriteLine("Enttity Id"+newDm.Entity.Id);
+            _context.Messages.Add(new Message{
+                DirectMessageId=newDm.Entity.Id,
+                FromProfileId=profile1.Id,
+                Text=profile1.FirstName+" matched"
+            });
+            await _context.SaveChangesAsync();
+            Console.WriteLine(_connectedRooms.ToString());
+            await Clients.Group(_connectedRooms[Context.ConnectionId]).SendAsync("onMatch");
+            await _context.Users.Where(u=>u.Id==IdentityUserId || u.Id == targetUserId).
+            ExecuteUpdateAsync(setters => setters.SetProperty(u => u.Matches,u=>Math.Max(u.Matches-1,0)));
+        }
+        public async Task SendMatchRequest(){
+            Console.WriteLine("Sending match request");
+            string IdentityUserId = Context.GetHttpContext().Items["UserId"]?.ToString();
+            var user = await _context.Users.FirstAsync(u=>u.Id==IdentityUserId);
+            if(!user.Subscribed && user.Matches <= 0){
+                Console.WriteLine("Not gud");
+                await Clients.Client(Context.ConnectionId).SendAsync("onError","Upgrade plan to get more than 3 matches per month",403,false);
+                return;
+            }
+            // _connectedRooms.TryGetValue(Context.ConnectionId, out var roomId);
+            // Console.WriteLine(roomId);
+            await Clients.OthersInGroup(_connectedRooms[Context.ConnectionId]).SendAsync("sendMatch",IdentityUserId, Context.ConnectionId);
+        }
 
 
 
@@ -243,11 +296,6 @@ namespace SignalRChat {
             string IdentityUserId = Context.GetHttpContext().Items["UserId"]?.ToString();
             
             _connections[IdentityUserId] = Context.ConnectionId;
-
-            var profileDoc = await _context.Profiles.FirstAsync(p=> p.IdentityUserId == IdentityUserId);
-            profileDoc.Sessions +=1;
-            _context.Profiles.Update(profileDoc);
-            await _context.SaveChangesAsync();
             await base.OnConnectedAsync();
         }
 

@@ -6,11 +6,13 @@ import { constants } from "@/app/helpers/constants";
 import { useEffect, useState } from "react";
 import CheckboxDropdown from "@/app/helpers/CheckboxDropdown";
 import { ImSpinner2 } from "react-icons/im";
+import { redirect } from "next/navigation";
 
 export default function ProfileForm({ProfileData}:{ProfileData:IProfile}){
     const [Profile,setProfile] = useState<IProfile>(ProfileData )
     const [changes,setChanges] = useState(false)
     const [saving, setSaving] = useState(false)
+    const [error,setError] = useState<null|string>()
     const changeDropdownField = (options:string[], field:keyof IProfile) =>{
         let newProfile = {
             ...Profile,
@@ -22,22 +24,26 @@ export default function ProfileForm({ProfileData}:{ProfileData:IProfile}){
     }
     const generateProfile = async ()=>{
         setSaving(true)
+        setError(null)
         try{
             const res = await createProfile(Profile)
-        }catch(error){
-            console.log(error)
-        }
-        setSaving(false)
+            location.replace("/platform/dashboard")
+        }catch(error:any){
+            setError(error.message)
+        }finally{setSaving(false)}
+        
     }
     const updateProfileData = async ()=>{
         setSaving(true)
+        setError(null)
         try{
             const res = await updateProfile(Profile)
             setChanges(false)
-        }catch(error){
+        }catch(error:any){
+            setError(error.message)
             console.log(error)
-        }
-        setSaving(false)
+        }finally{setSaving(false)}
+        
     }
 
     useEffect(()=>{
@@ -51,18 +57,19 @@ export default function ProfileForm({ProfileData}:{ProfileData:IProfile}){
 
     return(
         <div className="grid grid-cols-2 gap-4 w-[80%] relative">
-            { changes &&(<div className="absolute w-100% -top-10 w-full flex justify-center ">
-                <div className=" fixed p-4 items-center flex gap-24 flex justify-center bg-secondary rounded-md bg-opacity-10 w-fit">
-                    <h1>You have unsaved changes</h1>
-                    {!saving ?(
-                        <button onClick={()=> ProfileData ? updateProfileData() : generateProfile()} className="bg-secondary text-white p-2 rounded-md px-8 text-md shadow-2xl">{ProfileData? "Save":"Create"}</button>    
-                    ):(
-                        <div className="p-2 px-8 rounded-md bg-secondary bg-opacity-50">
-                            <ImSpinner2 className=" animate-spin text-white "></ImSpinner2>
-                        </div>
-                    )}
-                    
-
+            { changes &&(<div className="absolute w-100% -top-10 w-full flex justify-center z-[1000] ">
+                <div className=" fixed items-center  w-fit">
+                        {error && <p className="text-center text-red-600">{error}</p>}
+                    <div className="flex gap-24 items-center justify-center bg-secondary rounded-md bg-opacity-10 p-4">
+                        <h1>You have unsaved changes</h1>
+                        {!saving ?(
+                            <button onClick={()=> ProfileData ? updateProfileData() : generateProfile()} className="bg-secondary text-white p-2 rounded-md px-8 text-md shadow-2xl">{ProfileData? "Save":"Create"}</button>    
+                        ):(
+                            <div className="p-2 px-8 rounded-md bg-secondary bg-opacity-50">
+                                <ImSpinner2 className=" animate-spin text-white "></ImSpinner2>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>)}
 
@@ -86,16 +93,16 @@ export default function ProfileForm({ProfileData}:{ProfileData:IProfile}){
                     <h1 className="text-xl font-bold">Profile</h1>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="col-span-1 flex flex-col gap-2">
-                            <label className="text-sm text-black text-opacity-60 ">First Name</label>
+                            <label className="text-sm text-black text-opacity-60 ">First Name *</label>
                             <input placeholder="Enter first name" onChange={(e)=>setProfile({...Profile,["firstName"]:e.target.value})} defaultValue={Profile?.firstName} name="firstName" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 "></input>
                         </div>
                         <div className="col-span-1 flex flex-col gap-2">
-                            <label className="text-sm text-black text-opacity-60 ">Last Name</label>
+                            <label className="text-sm text-black text-opacity-60 ">Last Name *</label>
                             <input placeholder="Enter last name" onChange={(e)=>setProfile({...Profile,["lastName"]:e.target.value})} defaultValue={Profile?.lastName} name="lastName" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 "></input>
                         </div>
                         
                         <div className="flex flex-col gap-2 col-span-2">
-                            <label className="text-sm text-black text-opacity-60 ">Industry</label>
+                            <label className="text-sm text-black text-opacity-60 ">Industry *</label>
                             <select onChange={(e)=>setProfile({...Profile,["industry"]:e.target.value})} defaultValue={Profile?.industry} name="industry" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 ">
                                 {constants.industries.map((interests,index)=>{
                                     return(
@@ -105,7 +112,7 @@ export default function ProfileForm({ProfileData}:{ProfileData:IProfile}){
                             </select>
                         </div>
                         <div className="flex flex-col gap-2 ">
-                            <label className="text-sm text-black text-opacity-60 ">Avaliability</label>
+                            <label className="text-sm text-black text-opacity-60 ">Avaliability *</label>
                             <select onChange={(e)=>setProfile({...Profile,["avaliability"]:e.target.value})} defaultValue={Profile?.avaliability} name="avaliabilty" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 ">
                                 <option value={"Part-Time"}>Part Time</option>
                                 <option value={"Full Time"}>Full Time</option>
@@ -114,7 +121,7 @@ export default function ProfileForm({ProfileData}:{ProfileData:IProfile}){
                         </div>
                         
                         <div className="flex flex-col gap-2">
-                            <label className="text-sm text-black text-opacity-60 ">Current Role</label>
+                            <label className="text-sm text-black text-opacity-60 ">Current Role *</label>
                             <select onChange={(e)=>setProfile({...Profile,["currentRole"]:e.target.value})} defaultValue={Profile?.currentRole} name="interests" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 ">
                                 {constants.roles.map((role,index)=>{
                                     return(
@@ -162,22 +169,22 @@ export default function ProfileForm({ProfileData}:{ProfileData:IProfile}){
             </div>
             <div className="flex flex-col gap-4">
                 <div className="col-span-2 flex flex-col gap-4 p-6 bg-white rounded-md border-2">
-                    <label className="text-xl font-bold ">Bio</label>
+                    <label className="text-xl font-bold ">Bio *</label>
                     <textarea placeholder="Aspiring software engineer trying to build a fintech startup" onChange={(e)=>setProfile({...Profile,["description"]:e.target.value})} defaultValue={Profile?.description} name="description" className=" border-black border-opacity-15 rounded-md p-2 text-sm border-2 h-[100px] "></textarea>
                 </div>
                 <div className="flex flex-col gap-4 col-span-2 bg-white p-6 rounded-md border-2">
-                    <label className="text-xl font-bold ">Frameworks</label>
+                    <label className="text-xl font-bold ">Frameworks *</label>
                     {<PaddedList items={Profile?.frameworks}></PaddedList>}
                     <CheckboxDropdown checked={ProfileData?.frameworks} options={constants.frameworks} title="Choose your Frameworks" onSelectionChange={(e:any)=>changeDropdownField(e,"frameworks")}/>
                 </div>
                 <div className="flex flex-col gap-4 col-span- bg-white p-6 rounded-md border-2">
-                    <label className="font-bold text-xl ">Languages</label>
+                    <label className="font-bold text-xl ">Languages *</label>
                     {<PaddedList items={Profile?.programmingLanguages}></PaddedList>}
                     <CheckboxDropdown checked={ProfileData?.programmingLanguages} options={constants.languages} title="Languages" onSelectionChange={(e:any)=>changeDropdownField(e,"programmingLanguages")}/>
                 </div>
 
                 <div className="flex flex-col gap-4 col-span-2 bg-white p-6 rounded-md border-2">
-                    <label className="text-xl font-bold ">Interests</label>
+                    <label className="text-xl font-bold ">Interests *</label>
                     {<PaddedList items={Profile?.developmentInterests}></PaddedList>}
                     <CheckboxDropdown checked={ProfileData?.developmentInterests} options={constants.interests} title="Interests" onSelectionChange={(e:any)=>changeDropdownField(e,"developmentInterests")}/>
                 </div>

@@ -13,13 +13,16 @@ using System.Text.Json;
 [ApiController]
 public class ProfileController : ControllerBase {
     private readonly MyDBContext _context;
+    static readonly HttpClient client = new HttpClient();
+    private readonly IDbContextFactory<MyDBContext> _contextFactory;
     private readonly IndexClient _pc; //Pinecone
     private readonly EmbeddingClient _ec; //OpenAI
-    public ProfileController(MyDBContext context, IConfiguration configuration) {
+    public ProfileController(MyDBContext context, IConfiguration configuration, IDbContextFactory<MyDBContext> contextFactory) {
         _context = context;
         Console.WriteLine("Pinecone "+configuration["Pinecone:ApiKey"]);
         PineconeClient pineconeClient= new PineconeClient(configuration["Pinecone:ApiKey"]);
         _pc = pineconeClient.Index("profiles");
+        _contextFactory = contextFactory;
         _ec = new (model: "text-embedding-3-small",configuration["OpenAI:ApiKey"]);
     }
 
@@ -88,6 +91,8 @@ public class ProfileController : ControllerBase {
             return BadRequest(err.Message);
         }
     }
+    
+
 
     [Authorize]
     [HttpGet("")]
@@ -139,16 +144,20 @@ public class ProfileController : ControllerBase {
     }
     [HttpGet("similar/")]
     [Authorize]
-    public async Task<IActionResult> GetSimilarProfiles(){
-        HttpContext.Items.TryGetValue("UserId", out var UserId);
+    public async Task<IActionResult> GetSimilarProfiles([FromQuery] uint results = 25){
+        Console.WriteLine(results);
         try{
+            HttpContext.Items.TryGetValue("UserId", out var UserId);
+            var user = _context.Users.First(u=>u.Id==UserId);
+            if(!user.Subscribed)
+                return StatusCode(403,"User not subscribed");
             FetchResponse profile = await _pc.FetchAsync(new FetchRequest{
                 Ids=new[] { (string) UserId},
             });
             float[] profileVector = profile.Vectors.First().Value.Values.ToArray();
             QueryResponse matchingIds = await _pc.QueryAsync(new QueryRequest{
                 Vector= profileVector,
-                TopK=25,
+                TopK=results,
                 IncludeValues=true,
                 
                 Filter =new Pinecone.Metadata
@@ -168,7 +177,8 @@ public class ProfileController : ControllerBase {
                 matchingProfile.SimilarityScore = matchingId.Score.Value;
                 matchingProfiles.Add(matchingProfile);
             }
-            return Ok(matchingProfiles);
+            var matchingProfilesFilter = matchingProfiles.Where(p=>p.IdentityUserId != (string) UserId).ToList();
+            return Ok(matchingProfilesFilter);
             
         }catch(Exception err){
             Console.WriteLine(err.Message);
@@ -177,9 +187,15 @@ public class ProfileController : ControllerBase {
     }
 
     [HttpGet("search")]
+    // [Authorize]
     public async Task<IActionResult> SearchProfiles([FromQuery] string[] avaliability, [FromQuery] string[] industry, [FromQuery] string[] languages, [FromQuery] string[] interests, [FromQuery] string[] currentRole,[FromQuery] int page){
         
         try{
+            HttpContext.Items.TryGetValue("UserId", out var UserId);
+            var user = _context.Users.First(u=>u.Id==UserId);
+            if(!user.Subscribed)
+                return StatusCode(403,"User not subscribed");
+            
             var query = _context.Profiles.AsQueryable();
          
             if (avaliability != null && avaliability.Length > 0)
@@ -198,9 +214,9 @@ public class ProfileController : ControllerBase {
                 query = query.Where(p => currentRole.Any(cr => p.CurrentRole.Contains(cr)));
             
             var count = await query.CountAsync();
-            var paginatedResults = await query.OrderBy(p=>p.Id).Skip((page-1)*3).Take(3).ToListAsync();
+            var paginatedResults = await query.OrderBy(p=>p.Id).Skip((page-1)*6).Take(6).ToListAsync();
             
-            return Ok(new{paginatedResults,count=Math.Ceiling( (double)count/3)});
+            return Ok(new{paginatedResults,count=Math.Ceiling( (double)count/6)});
             
         }catch(Exception err){
             return BadRequest(err.Message);

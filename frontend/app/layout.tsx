@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
 import { Inter, Outfit,Rubik,Jost,Space_Grotesk, Ubuntu,DM_Sans,Poppins } from "next/font/google";
-
 import "./globals.css";
 import { UserProvider } from "./providers/UserContext";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import './utils/toast.css'
+import Script from "next/script";
+import dynamic from "next/dynamic";
+const AdBanner = dynamic(() => import("./components/ads/GoogleAdsense"), {
+  ssr: false,
+ });
 
 const poppins = Poppins({ subsets: ["latin"],weight:"400" });
 
@@ -19,8 +26,20 @@ export default function RootLayout({
 }>) {
   return (
     <html>
+      <head>
+        <Script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4540090412686189 `}
+          strategy="lazyOnload"
+          crossOrigin="anonymous"
+          
+        />
+        <AdBanner data-full-width-responsive="true" data-ad-format="display"  data-ad-slot="6246522761"></AdBanner>
+      </head>
       <body className={` max-top bg-complementary text-primary ${poppins.className}`}>
+        <ToastContainer></ToastContainer>
         {/* <UserProvider> */}
+
           {children}
       {/* </UserProvider> */}
 

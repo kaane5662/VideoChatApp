@@ -4,18 +4,28 @@ import Loading from "@/app/components/ui/loading";
 import { IUser } from "@/app/interfaces";
 import { getBillingPortal } from "@/app/services/subscriptions";
 import { fetcher } from "@/app/utils/fetcher";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 
 export default function Settings(){
     const [planPopup,setPlanPopup] = useState(false)
     const {data,isLoading,error} = useSWR(`${process.env.NEXT_PUBLIC_BASE_URL}/api/user`, fetcher)
-    console
+    const searchParams= useSearchParams()
+    useEffect(()=>{
+        
+        if( searchParams.get("displayPlans") == "yes"){
+            setPlanPopup(true)
+        }
+    },[searchParams])
+   
     if(isLoading) 
         return <Loading/>
     console.log(data)
+
     const User:IUser = data
 
+    
 
     function getPlan(){
         if(User.annualPlan) return "Yearly"
@@ -47,7 +57,7 @@ export default function Settings(){
                         <p className=" p-1 rounded-md pb-2  w-96 text-slate-500 text-sm">{User.id}</p>
                     </div>
                     <div className="flex flex-col gap-2">
-                        <label className="font-semibold text-sm">Subscription Id</label>
+                        <label className="font-semibold text-sm">Customer Id</label>
                         <p className=" p-1 rounded-md pb-2  w-96 text-slate-500 text-sm">{User.stripeCustomerId || "None"}</p>
                     </div>
                     <div className="flex flex-col gap-2">

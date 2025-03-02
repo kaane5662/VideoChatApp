@@ -119,6 +119,7 @@ interface Constants {
       'Machine Learning Engineer',
       'Cloud Architect',
       'Security Engineer',
+      'Student',
       'Mobile Developer',
     ],
     availability: [

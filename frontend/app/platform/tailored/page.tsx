@@ -5,17 +5,23 @@ import { getSimilarProfiles } from "../../services/profiles";
 import { IProfile } from "../../interfaces";
 import ProfileBanner from "../../components/profiles/ProfileBanner";
 import ProfileHeader from "../../components/profiles/ProfileHeader";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+
 
 export default function Tailored(){
+    const router = useRouter()
     const [Profiles,setProfiles]  = useState<IProfile[]>([])
     const getMatchingProfiles = async ()=>{
         try{
             const res = await getSimilarProfiles()
             console.log(res)
             setProfiles(res)
-        }catch(err){
-
+        }catch(err:any){
+            
+            toast.error(err.response.data || "Unexpected error has occured")
+            if(err.response.status == 403)
+                router.push("/platform/settings?displayPlans=yes")
         }
     }
 

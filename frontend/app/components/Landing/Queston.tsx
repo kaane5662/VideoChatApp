@@ -7,11 +7,11 @@ export default function Question({question, answer}:{question:string,answer:stri
 
     const [isOpen, toggleDropdown] = useState(false)
     return(
-        <div className=" w-[70%] font-outfit p-3 border-b-2 bg-white rounded-md border-opacity-20 relative">
+        <div className=" w-[70%] max-md:w-full font-outfit p-3 border-b-2 bg-white rounded-md border-opacity-20 relative">
             <div className="absolute top-4 right-2">
                 {!isOpen ? <FaChevronDown size={20} className=""></FaChevronDown>:<FaChevronUp size={20} className=""></FaChevronUp>}
             </div>
-            <div onClick={()=>toggleDropdown(!isOpen)} className=" cursor-pointer justify-center items-center  rounded-md text-xl font-semibold text-center ">
+            <div onClick={()=>toggleDropdown(!isOpen)} className=" cursor-pointer justify-center items-center  rounded-md text-xl max-md:text-sm font-semibold text-center ">
             {question}
             </div>
 

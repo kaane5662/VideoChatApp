@@ -17,6 +17,7 @@ namespace Services {
         private readonly IndexClient _pcRooms;
         private readonly IndexClient _pcProfiles;
         private readonly MyDBContext _context;
+        private readonly MyDBContext _contextFactory;
         private readonly ConnectedRoomsDictionary _connectedRooms;
         private readonly ConnectionsDictionary _connections;
         private readonly IServiceProvider _serviceProvider;
@@ -42,6 +43,7 @@ namespace Services {
             });
             var profileData = _context.Profiles.First(p=>p.IdentityUserId==user.IdentityUserId);
             float[] profileVector = profile.Vectors.First().Value.Values.ToArray();
+            
             //get matching profile vectors
             QueryResponse similarProfiles = await _pcProfiles.QueryAsync(new QueryRequest{
                 Vector=profileVector,
@@ -67,28 +69,46 @@ namespace Services {
                 Console.WriteLine($"Paired {user.IdentityUserId} with {similarProfile.Id}: {similarProfile.Score.Value}");
                 await _hubContext.Groups.AddToGroupAsync(user.ConnectionId, newRoomId);
                 await _hubContext.Groups.AddToGroupAsync(_connections[similarProfile.Id], newRoomId);
-                _connectedRooms[user.ConnectionId] = newRoomId;
-                _connectedRooms[_connections[similarProfile.Id]] = newRoomId;
                 
-                await _pcProfiles.UpdateAsync(new UpdateRequest{
+                
+                var updateUser =  _pcProfiles.UpdateAsync(new UpdateRequest{
                     Id = user.IdentityUserId,
                     SetMetadata = new Pinecone.Metadata{
                         ["status"] = new("occupied")
                     }
                 });
 
-                await _pcProfiles.UpdateAsync(new UpdateRequest{
+                var updateMatchedUser = _pcProfiles.UpdateAsync(new UpdateRequest{
                     Id = similarProfile.Id,
                     SetMetadata = new Pinecone.Metadata{
                         ["status"] = new("occupied")
                     }
                 });
+
+                await Task.WhenAll(updateUser,updateMatchedUser);
+                
                 await _hubContext.Clients.Group(newRoomId).SendAsync("RoomJoined");
                 var otherProfileData = await _context.Profiles.FirstAsync(p => p.IdentityUserId == similarProfile.Id);
+                
+                await _context.Users.Where(u=> 
+                (u.Id == otherProfileData.IdentityUserId || u.Id ==  profileData.IdentityUserId ) 
+                && u.Subscribed == false ).
+                ExecuteUpdateAsync(setters => setters.SetProperty(u => u.Credits,u=>Math.Max(u.Credits-1,0)));
                 profileData.SimilarityScore = similarProfile.Score.Value;
+                
                 otherProfileData.SimilarityScore = similarProfile.Score.Value;
+                _connectedRooms[user.ConnectionId] = newRoomId;
+                lock (_connectedRooms)
+                {
+                    _connectedRooms[user.ConnectionId] = newRoomId;
+                    _connectedRooms[_connections[similarProfile.Id]] = newRoomId;
+                }
+                // _connectedRooms.AddOrUpdate(user.ConnectionId,newRoomId,(_, _) => newRoomId);
+                // _connectedRooms.AddOrUpdate(_connections[similarProfile.Id],newRoomId,(_, _) => newRoomId);
+                
                 await _hubContext.Clients.Client(user.ConnectionId).SendAsync("OnClientJoin", _connections[similarProfile.Id], otherProfileData);
                 await _hubContext.Clients.Client( _connections[similarProfile.Id]).SendAsync("OnClientJoin", user.ConnectionId, profileData);
+
                 return true;
             }
 
@@ -103,14 +123,14 @@ namespace Services {
                 {
                     var dbContext = scope.ServiceProvider.GetRequiredService<MyDBContext>();
                     
-                    if(_userTasks.IsEmpty || _userTasks.Count <=1) {
+                    if(_userTasks.IsEmpty) {
                         await Task.Delay(2000);
                         continue;
                     }
                     await Task.Delay(5);
                     _userTasks.TryDequeue(out var current);
                     if(current.Retires <= 0) {
-                        await _hubContext.Clients.Client(current.ConnectionId).SendAsync("onError","Failed to join room",405);
+                        await _hubContext.Clients.Client(current.ConnectionId).SendAsync("onError","Too many join attempts",405);
                         continue;   
                     }
                     current.Retires -=1;

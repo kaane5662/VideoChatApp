@@ -12,7 +12,7 @@ namespace Consts {
         {
             public const int Yearly = 1000;
             public const int Premium = 500;
-            public const int Free = 100;
+            public const int Free = 50;
         }
     }
 }

@@ -66,6 +66,7 @@ builder.Services.AddAuthentication(options=>{
             // Console.WriteLine("Middleware Part 2");
             var userId = context.Principal.FindFirst(ClaimTypes.NameIdentifier).Value;
             // Console.WriteLine(userId);
+            
             context.HttpContext.Items["UserId"] = userId;
             // Console.WriteLine("Http context UserId: " + context.HttpContext.Items["UserId"]);
             return Task.CompletedTask;

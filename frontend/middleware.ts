@@ -5,6 +5,7 @@ export function middleware(request: NextRequest) {
   const authCookie = request.cookies.get('token');
     // console.log("Hello auth")
   // If the cookie is not found, redirect to the authentication page
+  
   if (!authCookie) {
     return NextResponse.redirect(new URL('/login', request.url));
   }

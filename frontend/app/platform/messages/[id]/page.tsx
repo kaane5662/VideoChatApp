@@ -7,6 +7,7 @@ import * as signalR from '@microsoft/signalr';
 import { getMyProfile, getMyProfileClient } from "@/app/services/profiles";
 import { cookies } from "next/headers";
 import { profile } from "console";
+import { toast } from "react-toastify";
 // import { useUser } from "@/app/providers/UserContext";
 
 export default function MessageThread({params}:any){
@@ -117,9 +118,9 @@ export default function MessageThread({params}:any){
     const sendMessage = async (e:FormData)=>{
         try{
             console.log(text)
-            if(text.length < 1 || MyProfile == null) return
+            if(text.length < 1 || MyProfile == null) return toast.error("Type at least one word")
             await connection?.invoke("SendDirectMessage",Number(id),text) as IMessage
-            
+            setText("")
            
         }catch(error){
             console.log(error)
