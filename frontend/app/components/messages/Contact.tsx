@@ -6,7 +6,7 @@ export default function Contact({directMessage}:{directMessage:IDirectMessage}){
     const router = useRouter()
     return(
 
-    <div onClick={()=>router.push(`/platform/messages/${directMessage.roomId}`)} className="flex gap-4 hover:bg-opacity-10 hover:cursor-pointer duration-300 hover:bg-secondary bg-white">
+    <div onClick={()=>router.push(`/platform/messages/${directMessage.roomId}`)} className="flex gap-4 hover:bg-opacity-10 hover:cursor-pointer rounded-md duration-300 hover:bg-secondary bg-white">
         
         <div className="flex gap-4  border-y p-4 w-full">
         <img className="h-8 w-8 rounded-full bg-secondary"></img>
@@ -17,9 +17,9 @@ export default function Contact({directMessage}:{directMessage:IDirectMessage}){
                     (<p className="text-secondary text-sm font-semibold">Cold</p>) }
                     
                 </div>
-                <p className="text-md  text-slate-500">{directMessage.recentText}</p>
+                <p className="text-sm  text-slate-500">{directMessage.recentText}</p>
             </div>
-            <h1 className=" justify-self-end text-sm ml-auto text-slate-500">{directMessage.recentCreatedAt}</h1>
+            <h1 className=" justify-self-end text-xs ml-auto text-slate-500">{directMessage.recentCreatedAt}</h1>
         </div>
     </div>
     )

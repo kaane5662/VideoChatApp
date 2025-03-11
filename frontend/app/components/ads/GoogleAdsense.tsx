@@ -1,6 +1,6 @@
 "use client"
 import Router from "next/router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 declare global {
  interface Window {
   adsbygoogle: unknown[];
@@ -15,47 +15,26 @@ interface AdsBannerProps {
 }
 
 const AdBanner = (props: AdsBannerProps) => {
- useEffect(() => {
-  const handleRouteChange = () => {
-   const intervalId = setInterval(() => {
-    try {
-     // Check if the 'ins' element already has an ad in it
-     if (window.adsbygoogle) {
-      window.adsbygoogle.push({});
-      clearInterval(intervalId);
-     }
-    } catch (err) {
-     console.error("Error pushing ads: ", err);
-     clearInterval(intervalId); // Ensure we clear interval on errors too
-    }
-   }, 100);
-   return () => clearInterval(intervalId); // Clear interval on component unmount
-  };
+    const adLoaded = useRef(false);
 
-  // Run the function when the component mounts
-  handleRouteChange();
+    useEffect(() => {
+      if (typeof window !== "undefined" && window.adsbygoogle && !adLoaded.current) {
+        window.adsbygoogle.push({
+            google_adtest: "on", // Enables test mode (prevents invalid clicks)
 
-  // Subscribe to route changes
-  if (typeof window !== "undefined") {
-   Router.events.on("routeChangeComplete", handleRouteChange);
-
-   // Unsubscribe from route changes when the component unmounts
-   return () => {
-    Router.events.off("routeChangeComplete", handleRouteChange);
-   };
-  }
- }, []);
+        });
+        
+        adLoaded.current = true; // Prevent multiple ad pushes
+      }
+    }, []); 
 
  return (
   <ins
-   className=" adbanner-customize mt-2 border-2 fixed self-center top-0 z-[10000000]"
-   style={{
-    display: "block",
-    overflow: "hidden",
-    border: process.env.NODE_ENV === "development" ? "1px solid red" : "none",
-   }}
+   className=" adbanner-customize mt-2 border-2 h-[500px] w-[400px] fixed self-center top-0 z-[10000000]"
+   style={{ display: "block", textAlign: "center", margin: "20px 0" }}
+
    data-adtest="on"
-   data-ad-client={"ca-pub-4540090412686189"}
+   data-ad-client={"ca-pub-3940256099942544"}
    {...props}
   />
  );

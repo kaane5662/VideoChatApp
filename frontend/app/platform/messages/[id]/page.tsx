@@ -8,6 +8,8 @@ import { getMyProfile, getMyProfileClient } from "@/app/services/profiles";
 import { cookies } from "next/headers";
 import { profile } from "console";
 import { toast } from "react-toastify";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaTrashCan } from "react-icons/fa6";
 // import { useUser } from "@/app/providers/UserContext";
 
 export default function MessageThread({params}:any){
@@ -176,7 +178,7 @@ export default function MessageThread({params}:any){
     // useEffect(()=>{connection?.invoke("JoinDmThread",id)},[connection])
     return(
         <main className="flex flex-col justify-between h-full">
-            <div className="flex gap-4 w-full border-y-2 p-2">
+            <div className="flex gap-4 items-center w-full border-y-2 p-2">
                 <div className="relative h-fit">
                     <img className="h-8 w-8 bg-secondary rounded-full"/>
                   
@@ -195,8 +197,8 @@ export default function MessageThread({params}:any){
                         <div key={index} className={`flex relative flex-col gap-1 w-[50%] ${message.fromProfileId == MyProfile.id ? "ml-auto":" "}`}>
                             {/* <p className="text-black">{message.id}</p> */}
                             {message.fromProfileId == MyProfile.id && (<div className="flex gap-4 items-center text-xs">
-                                <button onClick={()=>deleteMessage(message.id)}>Remove</button>
-                                <button onClick={()=>setEditing(message.id)}>Edit</button>
+                                <button className="text-slate-500 hover:scale-105" onClick={()=>deleteMessage(message.id)}><FaTrashCan/></button>
+                                <button className="text-slate-500 hover:scale-105" onClick={()=>setEditing(message.id)}><FaEdit/></button>
                             </div>)}
                             {editing && message.id == editing ? (
                                 <form className="flex gap-2" action={(e)=>editMessage(message.id,e)}>
@@ -206,8 +208,8 @@ export default function MessageThread({params}:any){
                             ):(
 
                             <div>
-                                <p className={`px-4 p-2 text-sm w-fit rounded-xl shadow-md ${message.fromProfileId == MyProfile.id ? "bg-secondary text-white":" bg-secondary bg-opacity-10"}`}>{message.text}</p>
-                                <h3 className="text-sm text-slate-400">{ (message.firstName || (message.fromProfileId == OtherProfile.id ? OtherProfile.firstName : MyProfile.firstName)) + " " + new Date(message.createdAt).toLocaleString()} </h3>
+                                <p className={`px-4 p-2 text-sm w-fit rounded-xl shadow-md ${message.fromProfileId == MyProfile.id ? "bg-secondary text-white":" bg-slate-100 text-black"}`}>{message.text}</p>
+                                <h3 className="text-xs text-slate-500">{ (message.firstName || (message.fromProfileId == OtherProfile.id ? OtherProfile.firstName : MyProfile.firstName)) + " " + new Date(message.createdAt).toLocaleString()} </h3>
                             </div>
                             )}
                         </div>
@@ -225,9 +227,9 @@ export default function MessageThread({params}:any){
                     })} is typing</h1>
                 ) }
                 
-                <div className=" flex gap-2">
-                    <input onFocus={startTyping } value={text} onChange={(e)=>setText(e.target.value)} name="text" placeholder="Send a message..." className="border-2 p-2 text-sm w-full h-50 rounded-sm shadow-md rounded-xl"></input>
-                    <button><IoSend size={35} className="bg-secondary text-white shadow-md p-2 rounded-full"></IoSend></button>
+                <div className=" flex flex-col gap-2 border-2 bg-slate-100 p-2 text-sm w-full shadow-md rounded-xl">
+                    <input onFocus={startTyping } value={text} onChange={(e)=>setText(e.target.value)} name="text" placeholder="Send a message..." className="bg-white bg-opacity-0 text-sm w-full h-18 focus:ring-0 focus:outline-none"></input>
+                    <button className="bg-secondary text-white shadow-md p-2 rounded-full ml-auto"><IoSend size={14}></IoSend></button>
 
                 </div>
                 

@@ -231,8 +231,8 @@ namespace SignalRChat {
                 Text=profile1.FirstName+" matched"
             });
             await _context.SaveChangesAsync();
-            Console.WriteLine(_connectedRooms.ToString());
-            await Clients.Group(_connectedRooms[Context.ConnectionId]).SendAsync("onMatch");
+            _connectedRooms.TryGetValue(Context.ConnectionId, out var roomId);
+            await Clients.Group(roomId).SendAsync("onMatch");
             await _context.Users.Where(u=>u.Id==IdentityUserId || u.Id == targetUserId).
             ExecuteUpdateAsync(setters => setters.SetProperty(u => u.Matches,u=>Math.Max(u.Matches-1,0)));
         }
@@ -247,7 +247,8 @@ namespace SignalRChat {
             }
             // _connectedRooms.TryGetValue(Context.ConnectionId, out var roomId);
             // Console.WriteLine(roomId);
-            await Clients.OthersInGroup(_connectedRooms[Context.ConnectionId]).SendAsync("sendMatch",IdentityUserId, Context.ConnectionId);
+            _connectedRooms.TryGetValue(Context.ConnectionId, out var roomId);
+            await Clients.OthersInGroup(roomId).SendAsync("sendMatch",IdentityUserId, Context.ConnectionId);
         }
 
 
@@ -295,7 +296,7 @@ namespace SignalRChat {
             Console.WriteLine($"Connected: {Context.ConnectionId}");
             string IdentityUserId = Context.GetHttpContext().Items["UserId"]?.ToString();
             
-            _connections[IdentityUserId] = Context.ConnectionId;
+            _connections.AddOrUpdate(IdentityUserId, Context.ConnectionId, (p,r)=>Context.ConnectionId);
             await base.OnConnectedAsync();
         }
 

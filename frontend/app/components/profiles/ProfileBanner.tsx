@@ -19,11 +19,11 @@ export default function ProfileBanner({ProfileData}:{ProfileData:IProfile}){
             <h1 className="text-2xl font-bold">Profile</h1>
             <div className="bg-white flex flex-col col-span-2 gap-4  p-6 h-fit rounded-md border-2 shadow-md">
                 <div className="flex gap-8 ">
-                    <img className="bg-secondary h-16 w-16 rounded-full"></img>
+                    <img className="bg-secondary h-12 w-12 rounded-full"></img>
                     <div className="flex flex-col">
-                        <h1 className="font-bold text-xl">{ProfileData?.firstName} {ProfileData?.lastName}</h1>   
-                        <h1 className="text-black text-opacity-50 text-md ">{ProfileData?.currentRole}</h1>
-                        <p className="text-md pt-4">{ProfileData.description}</p>
+                        <h1 className="font-bold text-lg">{ProfileData?.firstName} {ProfileData?.lastName}</h1>   
+                        <h1 className="text-black text-opacity-50 text-sm ">{ProfileData?.currentRole}</h1>
+                        <p className="text-sm pt-4">{ProfileData.description}</p>
 
                     </div>
                     <InitDm profileId={ProfileData?.id}/>
@@ -35,20 +35,20 @@ export default function ProfileBanner({ProfileData}:{ProfileData:IProfile}){
                         <h3 className="text-md font-bold">Links and Socials</h3>
                         <div className="flex flex-col gap-4 text-sm">
                             <div className="flex flex-col gap-2">
-                                <h4 className="font-bold">Github URL</h4>
-                                <a href={ProfileData?.githubUrl} className="text-slate-400 hover:underline hover:cursor-pointer">{ProfileData?.githubUrl || "None"}</a>
+                                <h4 className="font-bold text-sm">Github URL</h4>
+                                <a href={ProfileData?.githubUrl} className="text-slate-400 text-xs hover:underline hover:cursor-pointer">{ProfileData?.githubUrl || "None"}</a>
                             </div>
                             <div className="flex flex-col gap-2">
-                                <h4 className="font-bold">LinkedIn URL</h4>
-                                <a className="text-slate-400 hover:underline hover:cursor-pointer">{ProfileData?.linkedInUrl || "None"}</a>
+                                <h4 className="font-bold text-sm">LinkedIn URL</h4>
+                                <a className="text-slate-400 text-xs hover:underline hover:cursor-pointer">{ProfileData?.linkedInUrl || "None"}</a>
                             </div>
                             <div className="flex flex-col gap-2">
-                                <h4 className="font-bold">Twitter URL</h4>
-                                <a className="text-slate-400 hover:underline hover:cursor-pointer">{ProfileData?.twitterUrl || "None"}</a>
+                                <h4 className="font-bold text-sm">Twitter URL</h4>
+                                <a className="text-slate-400 text-xs hover:underline hover:cursor-pointer">{ProfileData?.twitterUrl || "None"}</a>
                             </div>
                             <div className="flex flex-col gap-2">
-                                <h4 className="font-bold">Portfolio URL</h4>
-                                <a className="text-slate-400 hover:underline hover:cursor-pointer">{ProfileData?.portfolioUrl || "None"}</a>
+                                <h4 className="font-bold text-sm">Portfolio URL</h4>
+                                <a className="text-slate-400 text-xs hover:underline hover:cursor-pointer">{ProfileData?.portfolioUrl || "None"}</a>
                             </div>
                         </div>
                         
@@ -63,11 +63,11 @@ export default function ProfileBanner({ProfileData}:{ProfileData:IProfile}){
                 <div className="grid grid-cols-1 gap-4 col-span-2">
                     <div className="flex flex-col gap-2 p-4 rounded-md border-2 shadow-md bg-white">
                         <h2 className="font-bold text-md">Industry</h2>
-                        <h3 className="  text-black text-opacity-50">{ProfileData?.industry}</h3>
+                        <h3 className="  text-slate-500 text-sm">{ProfileData?.industry}</h3>
                     </div>
                     <div className="flex flex-col gap-2 p-4 rounded-md border-2 shadow-md bg-white">
                         <h2 className="font-bold text-md">Avaliability</h2>
-                        <h3 className="  text-black text-opacity-50">{ProfileData?.avaliability}</h3>
+                        <h3 className="  text-slate-500 text-sm">{ProfileData?.avaliability}</h3>
                     </div>
                     <div className="flex flex-col gap-2 p-4 rounded-md border-2 shadow-md bg-white">
                         <h2 className="font-bold text-md">Interests</h2>

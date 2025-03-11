@@ -35,7 +35,9 @@ export default function Peers(){
     const [screenShareToggled, setScreenShareToggled] = useState(false)
     const joiningRoom = useRef(true)  
     const [messages,setMessages] = useState<IVideoChat[]>([])
-
+    
+    const [videoVolume,setVolume] = useState(1)
+    const [volumePopUp,setVolumePopup] = useState(false)
 
     const configuration = {
         iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
@@ -118,15 +120,20 @@ export default function Peers(){
         })
   
         hubConnection.on('ReceiveOffer', async (fromConnectionId,offer) => {
-            console.log("Recieved offer: ",fromConnectionId)
+            // console.log("Recieved offer: ",fromConnectionId)
             const pc = new RTCPeerConnection(configuration);
             peerConnection.current = pc
 
             pc.ontrack = (event) => {
+                console.log(event)
                 if (remoteVideoRef.current) {
                     console.log("Streaming the video", event.streams[0])
                     remoteVideoRef.current.srcObject = event.streams[0];
                     
+                }
+                event.track.onmute=()=>{
+                    console.log("Camera closed")
+                    remoteVideoRef.current && (remoteVideoRef.current.srcObject = null)
                 }
             };
 
@@ -137,6 +144,7 @@ export default function Peers(){
                 }
             };
 
+            
             pc.onsignalingstatechange = () => {
                 console.log("Signaling state:", pc.signalingState);
             };
@@ -165,8 +173,12 @@ export default function Peers(){
         hubConnection.on('ReceiveCandidate', async (candidate) => {
             if (!peerConnection.current) return
             console.log("Recived ICE candidate" );
-            console.log(candidate)
-            console.log(candidate)
+            // console.log(candidate)
+            // if(!peerConnection.current.signalingState || peerConnection.current.signalingState == "stable") {
+            //     remoteVideoRef.current && (remoteVideoRef.current.srcObject = null)
+            //     return
+            // }
+            if(!peerConnection.current.signalingState) return
             await peerConnection.current.addIceCandidate(new RTCIceCandidate(JSON.parse(candidate)));
           
         });
@@ -176,7 +188,7 @@ export default function Peers(){
             peerConnection.current?.close()
             streamRef.current = null
             console.log("left room")
-            joinRoom()
+            toast.info("User has left the room")
         })
         
         hubConnection.on('onError',async(message,code,redirect=true)=>{
@@ -223,8 +235,9 @@ export default function Peers(){
         }
     };
 
+
     const toggleCamera = () => {
-        console.log("on camera change")
+        console.log("on camera change",videoToggled)
         if (streamRef.current) {
             const videoTrack = streamRef.current.getVideoTracks()[0];
             streamRef.current.getTracks().forEach(track => {
@@ -249,7 +262,7 @@ export default function Peers(){
         
         
         console.log("Joining room")
-        connection?.invoke("JoinPool")
+        connection.invoke("JoinPool")
 
     }
 
@@ -273,8 +286,14 @@ export default function Peers(){
     const skipRoom = async () =>{
         if(!connection && !peerConnection) return;
         console.log("Skipping Room")
-        streamRef.current = null
         peerConnection.current = null
+        
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => {
+              track.stop();
+            });
+        }
+        setVideoToggled(false)
         setMessages([])
         setConnectedProfile(null)
         await connection?.invoke("LeaveRoom").catch(err => console.error(err))
@@ -309,15 +328,19 @@ export default function Peers(){
     useEffect(()=>{
         if(!connection) return
         createOffer()
-        return()=>{
-            endSession()
-        }
+        
     },[muted,videoToggled])
 
     useEffect(()=>{
         if(ConnectedProfile)
             setMatched(false)
     },[ConnectedProfile])
+
+    // useEffect(()=>{
+    //     if(remoteVideoRef.current)
+    //         remoteVideoRef.current.volume = videoVolume
+    // },[videoVolume])
+    
     
     useEffect(()=>{
         console.log("Initialized")
@@ -329,7 +352,14 @@ export default function Peers(){
         return()=>{
             console.log("Connection state: ",hubConnection.state)
             console.log("Unmounted component")
-            setVideoToggled(false)
+            if (streamRef.current) {
+                streamRef.current.getTracks().forEach(track => {
+                  track.stop();
+                });
+              }
+            if (peerConnection.current) {
+                peerConnection.current.close();
+            }
             if(hubConnection.state == signalR.HubConnectionState.Disconnected || hubConnection.state == signalR.HubConnectionState.Connecting) return
             hubConnection.stop().then(()=>console.log("Disconnected session"))
             
@@ -342,6 +372,8 @@ export default function Peers(){
             <Intro joinRoom={joinRoom}></Intro>
         )
     }
+
+
     
 
     return(
@@ -356,20 +388,26 @@ export default function Peers(){
                 
                 <div className="p-2 px-12 bg-opacity-40 absolute mx-auto bottom-10 right-0 left-0  rounded-sm flex gap-4 w-fit self-center text-white">
                     <button onClick={toggleMute}>
-                    {!muted ? (<FaMicrophoneSlash size={50} className="bg-red-500 rounded-full text-white p-3  border-opacity-15 hover:cursor-pointer duration-300 hover:opacity-70 border-black text-white "></FaMicrophoneSlash>):(<FaMicrophone size={50} className="bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 p-3  border-opacity-15 hover:cursor-pointer duration-300 hover:opacity-70 text-white border-black "></FaMicrophone>)}
+                    {!muted ? (<FaMicrophoneSlash size={50} className="bg-red-500 rounded-md text-white p-3  border-opacity-15 hover:cursor-pointer duration-300 hover:opacity-70 border-black text-white "></FaMicrophoneSlash>):(<FaMicrophone size={50} className="bg-white bg-opacity-20 rounded-md hover:bg-opacity-30 p-3  border-opacity-15 hover:cursor-pointer duration-300 hover:opacity-70 text-white border-black "></FaMicrophone>)}
 
                     </button>
                     <button onClick={toggleCamera}>
-                    {!videoToggled ? (<BsCameraVideoFill size={50} className="bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 text-white p-3  border-opacity-15 border-black "></BsCameraVideoFill>):(<BsFillCameraVideoOffFill size={50} className="bg-red-500 rounded-full text-white p-3  border-opacity-15 border-black "></BsFillCameraVideoOffFill>)}
+                    {!videoToggled ? (<BsCameraVideoFill size={50} className="bg-white bg-opacity-20 rounded-md hover:bg-opacity-30 text-white p-3   border-opacity-15 border-black "></BsCameraVideoFill>):(<BsFillCameraVideoOffFill size={50} className="bg-red-500 rounded-md text-white p-3  border-opacity-15 border-black "></BsFillCameraVideoOffFill>)}
                     </button>
-                    <button onClick={()=>setScreenShareToggled(!screenShareToggled)}>
-                        {!screenShareToggled ? (<LuScreenShare  size={50} className="bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 p-3  border-opacity-15 hover:cursor-pointer duration-300 hover:opacity-70 border-black "></LuScreenShare>):(<LuScreenShareOff  size={50} className="bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 p-3  bg-red-500 text-white border-opacity-15 hover:cursor-pointer duration-300 hover:opacity-70 border-black "></LuScreenShareOff>)}
+                    {/* <button onClick={()=>setScreenShareToggled(!screenShareToggled)}>
+                        {!screenShareToggled ? (<LuScreenShare  size={50} className="bg-white bg-opacity-20 rounded-md hover:bg-opacity-30 p-3  border-opacity-15 hover:cursor-pointer duration-300 hover:opacity-70 border-black "></LuScreenShare>):(<LuScreenShareOff  size={50} className="bg-white bg-opacity-20 rounded-md hover:bg-opacity-30 p-3  bg-red-500 text-white border-opacity-15 hover:cursor-pointer duration-300 hover:opacity-70 border-black "></LuScreenShareOff>)}
+                    </button> */}
+                    <button className="relative flex justify-center">
+                        {/* {volumePopUp && 
+                        <input value={videoVolume} min={0} max={1} step={.1} className="p-1 absolute -top-8 text-secondary left-auto right-auto !rounded-sm accent-secondary" 
+                        onChange={(e)=>setVolume(parseFloat(e.target.value))} 
+                        type="range"/>}
+                         */}
+                        <BiVolumeLow /*onClick={()=>setVolumePopup(!volumePopUp)}*/ size={50} className="bg-white bg-opacity-20 rounded-md hover:bg-opacity-30 p-3  border-opacity-15 hover:cursor-pointer duration-300 hover:opacity-70 border-black "></BiVolumeLow>
                     </button>
                     
-                    <BiVolumeLow onClick={joinRoom} size={50} className="bg-white bg-opacity-20 rounded-full hover:bg-opacity-30 p-3  border-opacity-15 hover:cursor-pointer duration-300 hover:opacity-70 border-black "></BiVolumeLow>
-                    
-                    <IoExit onClick={skipRoom} size={50} className="bg-secondary rounded-full text-white p-3  border-opacity-15 hover:cursor-pointer duration-300 hover:opacity-70 border-white ">Leave Room</IoExit>
-                    <FaPhoneSlash onClick={endSession} size={50} className="bg-red-500 rounded-full text-white p-3  border-opacity-15 hover:cursor-pointer duration-300 hover:opacity-70 border-white "></FaPhoneSlash>
+                    <IoExit onClick={skipRoom} size={50} className="bg-secondary rounded-md text-white p-3  border-opacity-15 hover:cursor-pointer duration-300 hover:opacity-70 border-white ">Leave Room</IoExit>
+                    <FaPhoneSlash onClick={endSession} size={50} className="bg-red-500 rounded-md text-white p-3  border-opacity-15 hover:cursor-pointer duration-300 hover:opacity-70 border-white "></FaPhoneSlash>
                 </div>
                 
             </div>

@@ -4,9 +4,9 @@ export default function ActivityCard({title,value,icon}:{title:string,value:numb
     return(
         <div className="p-4 bg-white border-2 border-opacity-20  flex gap-4 rounded-xl border-2 shadow-md">
             {icon}
-            <div className="flex flex-col gap-2">
-                <h3 className=" ">{title}</h3>
-                <p className="text-slate-500 text-sm">{value}</p>
+            <div className="flex flex-col gap-1">
+                <h3 className="text-sm ">{title}</h3>
+                <p className="text-slate-500 text-xs">{value}</p>
             </div>
         </div>
     )

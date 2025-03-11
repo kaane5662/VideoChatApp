@@ -7,9 +7,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import './utils/toast.css'
 import Script from "next/script";
 import dynamic from "next/dynamic";
-const AdBanner = dynamic(() => import("./components/ads/GoogleAdsense"), {
-  ssr: false,
- });
+import AdBanner from "./components/ads/GoogleAdsense";
+// const AdBanner = dynamic(() => import("./components/ads/GoogleAdsense"), {
+//   ssr: false,
+//  });
 
 const poppins = Poppins({ subsets: ["latin"],weight:"400" });
 
@@ -29,14 +30,16 @@ export default function RootLayout({
       <head>
         <Script
           async
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4540090412686189 `}
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4540090412686189`}
           strategy="lazyOnload"
           crossOrigin="anonymous"
-          
+          data-first-party-cookies="true"
+
         />
-        <AdBanner data-full-width-responsive="true" data-ad-format="display"  data-ad-slot="6246522761"></AdBanner>
       </head>
       <body className={` max-top bg-complementary text-primary ${poppins.className}`}>
+        {/* <AdBanner data-full-width-responsive="true" data-ad-format="display"  data-ad-slot="0000000000"></AdBanner> */}
+      
         <ToastContainer></ToastContainer>
         {/* <UserProvider> */}
 

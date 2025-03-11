@@ -29,7 +29,7 @@ export default async function Dashboard(){
     return(
         <main className="  min-h-screen p-12 gap-8 flex flex-col ">
             {/* <Navbar></Navbar> */}
-            <AdBanner data-full-width-responsive="true" data-ad-format="display"  data-ad-slot="6246522761"></AdBanner>
+            {/* <AdBanner data-full-width-responsive="true" data-ad-format="display"  data-ad-slot="6246522761"></AdBanner> */}
             <div className="flex flex-col gap-2">
                 <h1 className="font-bold text-4xl ">Hi, {Profile?.firstName}</h1>
                 <h3 className="text-slate-500 text-md">Your journey to finding the perfect co-founder starts here.</h3>

@@ -97,17 +97,12 @@ namespace Services {
                 profileData.SimilarityScore = similarProfile.Score.Value;
                 
                 otherProfileData.SimilarityScore = similarProfile.Score.Value;
-                _connectedRooms[user.ConnectionId] = newRoomId;
-                lock (_connectedRooms)
-                {
-                    _connectedRooms[user.ConnectionId] = newRoomId;
-                    _connectedRooms[_connections[similarProfile.Id]] = newRoomId;
-                }
-                // _connectedRooms.AddOrUpdate(user.ConnectionId,newRoomId,(_, _) => newRoomId);
-                // _connectedRooms.AddOrUpdate(_connections[similarProfile.Id],newRoomId,(_, _) => newRoomId);
+                _connections.TryGetValue(similarProfile.Id, out var otherConnectionId);
+                _connectedRooms.AddOrUpdate(user.ConnectionId, newRoomId, (k,old)=>newRoomId);
+                _connectedRooms.AddOrUpdate(otherConnectionId, newRoomId, (k,old)=>newRoomId);
                 
-                await _hubContext.Clients.Client(user.ConnectionId).SendAsync("OnClientJoin", _connections[similarProfile.Id], otherProfileData);
-                await _hubContext.Clients.Client( _connections[similarProfile.Id]).SendAsync("OnClientJoin", user.ConnectionId, profileData);
+                await _hubContext.Clients.Client(user.ConnectionId).SendAsync("OnClientJoin", otherConnectionId, otherProfileData);
+                await _hubContext.Clients.Client( otherConnectionId).SendAsync("OnClientJoin", user.ConnectionId, profileData);
 
                 return true;
             }
@@ -130,7 +125,7 @@ namespace Services {
                     await Task.Delay(5);
                     _userTasks.TryDequeue(out var current);
                     if(current.Retires <= 0) {
-                        await _hubContext.Clients.Client(current.ConnectionId).SendAsync("onError","Too many join attempts",405);
+                        await _hubContext.Clients.Client(current.ConnectionId).SendAsync("onError","No users found, retrying...",405);
                         continue;   
                     }
                     current.Retires -=1;

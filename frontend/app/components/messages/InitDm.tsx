@@ -25,7 +25,7 @@ export default function InitDm({profileId}:{profileId:number}){
         loading ?(
             <FaSpinner className="rounded-xl p-2 px-4 h-fit bg-opacity-70 hover:opacity-70 duration-300 bg-secondary text-white ml-auto"></FaSpinner>
         ):(
-            <button onClick={createThread} className="rounded-xl text-md h-fit p-2 px-4 hover:opacity-70 duration-300 bg-secondary text-white ml-auto">Message</button>
+            <button onClick={createThread} className="rounded-full text-sm h-fit p-2 px-4 hover:opacity-70 duration-300 bg-secondary text-white ml-auto">Message</button>
         )
         
     )

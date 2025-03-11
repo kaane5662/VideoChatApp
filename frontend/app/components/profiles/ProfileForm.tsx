@@ -90,7 +90,7 @@ export default function ProfileForm({ProfileData}:{ProfileData:IProfile}){
 
 
                 <div className="bg-white p-6 flex flex-col gap-4 rounded-md border-2">
-                    <h1 className="text-xl font-bold">Profile</h1>
+                    <h1 className="text-xl font-bold">Profile *</h1>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="col-span-1 flex flex-col gap-2">
                             <label className="text-sm text-black text-opacity-60 ">First Name *</label>
