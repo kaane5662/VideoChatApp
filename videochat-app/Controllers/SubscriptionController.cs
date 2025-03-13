@@ -48,8 +48,8 @@ public class SubscriptionController : ControllerBase
                     },
                 },
                 Mode = "subscription",
-                SuccessUrl = "https://yourwebsite.com/success",
-                CancelUrl = "https://yourwebsite.com/cancel",
+                SuccessUrl = $"{_configuration["Client:Domain"]}/platform/settings?success=yes",
+                CancelUrl = $"{_configuration["Client:Domain"]}/platform/settings?success=no",
                 Metadata = new Dictionary<string, string>
                 {
                     { "userId", user.Id }
@@ -80,7 +80,7 @@ public class SubscriptionController : ControllerBase
             var options = new Stripe.BillingPortal.SessionCreateOptions
             {
                 Customer = user.StripeCustomerId,
-                ReturnUrl = "https://yourwebsite.com/account" // Redirect URL after the portal session ends
+                ReturnUrl = $"{_configuration["Client:Domain"]}/platform/settings" // Redirect URL after the portal session ends
             };
             var service = new Stripe.BillingPortal.SessionService();
             var session = service.Create(options);

@@ -112,7 +112,7 @@ public class ProfileController : ControllerBase {
 
     [HttpGet("similar/{id}")]
     [Authorize]
-    public async Task<IActionResult> GetSimilarProfilesById(int id){
+    public async Task<IActionResult> GetSimilarProfilesById(int id, [FromQuery] uint results){
         
         try{
             Console.WriteLine(id);
@@ -124,18 +124,24 @@ public class ProfileController : ControllerBase {
             float[] profileVector = profile.Vectors.First().Value.Values.ToArray();
             QueryResponse matchingIds = await _pc.QueryAsync(new QueryRequest{
                 Vector= profileVector,
-                TopK=4,
+                TopK=results,
                 IncludeValues=true
             });
             // Console.WriteLine(matchingIds);
-            var matchingProfiles = new List<Profile>();
-            foreach(var matchingId in matchingIds.Matches.ToList()){
-                var matchingProfile = await _context.Profiles.FirstAsync(p=>p.IdentityUserId == matchingId.Id);
+            var tasks = matchingIds.Matches
+            .Select(async matchingId =>
+            {
+                using var dbContext = _contextFactory.CreateDbContext(); // Use context factory
+                var matchingProfile = await dbContext.Profiles.FirstOrDefaultAsync(p => p.IdentityUserId == matchingId.Id);
+                if(matchingProfile==null) return null;
                 matchingProfile.SimilarityScore = matchingId.Score.Value;
-                matchingProfiles.Add(matchingProfile);
-            }
-            Console.WriteLine(matchingProfiles.ToArray().ToString());
-            return Ok(matchingProfiles);
+                return matchingProfile;
+            });
+            var matchingProfilesPromise = await Task.WhenAll(tasks);
+            var matchingProfiles = matchingProfilesPromise.ToList();
+            Console.WriteLine("You made it here");
+            var matchingProfilesFilter = matchingProfiles.Where(p=> p != null && p.IdentityUserId != (string) otherProfile.IdentityUserId).ToList();
+            return Ok(matchingProfilesFilter);
             
         }catch(Exception err){
             Console.WriteLine(err.Message);
@@ -148,40 +154,40 @@ public class ProfileController : ControllerBase {
         Console.WriteLine(results);
         try{
             HttpContext.Items.TryGetValue("UserId", out var UserId);
-            var user = _context.Users.First(u=>u.Id==UserId);
+            var user = await _context.Users.FirstAsync(u=>u.Id==UserId);
             if(!user.Subscribed)
                 return StatusCode(403,"User not subscribed");
             FetchResponse profile = await _pc.FetchAsync(new FetchRequest{
                 Ids=new[] { (string) UserId},
             });
-            float[] profileVector = profile.Vectors.First().Value.Values.ToArray();
+            var profileVector = profile.Vectors.First().Value.Values;
+            Console.WriteLine("Profile Vector: "+profileVector.ToString());
             QueryResponse matchingIds = await _pc.QueryAsync(new QueryRequest{
                 Vector= profileVector,
                 TopK=results,
                 IncludeValues=true,
-                
-                Filter =new Pinecone.Metadata
-                {
-                    ["Id"] =
-                        new Pinecone.Metadata
-                        {
-                            ["$ne"] = (string) UserId,
-                        }
-                },
-                        });
             
-            // Console.WriteLine(matchingIds);
-            var matchingProfiles = new List<Profile>();
-            foreach(var matchingId in matchingIds.Matches.ToList()){
-                var matchingProfile = await _context.Profiles.FirstAsync(p=>p.IdentityUserId == matchingId.Id);
+            });
+
+
+            var tasks = matchingIds.Matches
+            .Select(async matchingId =>
+            {
+                using var dbContext = _contextFactory.CreateDbContext(); // Use context factory
+                var matchingProfile = await dbContext.Profiles.FirstOrDefaultAsync(p => p.IdentityUserId == matchingId.Id);
+                if(matchingProfile==null) return null;
                 matchingProfile.SimilarityScore = matchingId.Score.Value;
-                matchingProfiles.Add(matchingProfile);
-            }
-            var matchingProfilesFilter = matchingProfiles.Where(p=>p.IdentityUserId != (string) UserId).ToList();
+                return matchingProfile;
+            });
+            var matchingProfilesPromise = await Task.WhenAll(tasks);
+            var matchingProfiles = matchingProfilesPromise.ToList();
+            Console.WriteLine("You made it here");
+            var matchingProfilesFilter = matchingProfiles.Where(p=> p != null && p.IdentityUserId != (string) UserId).ToList();
             return Ok(matchingProfilesFilter);
             
         }catch(Exception err){
-            Console.WriteLine(err.Message);
+            Console.WriteLine(err);
+            Console.WriteLine("Error:"+err.Message);
             return BadRequest(err.Message);
         }
     }

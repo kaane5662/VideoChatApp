@@ -108,6 +108,7 @@ builder.Services.AddSignalR(options =>
 builder.Services.AddSingleton<ConcurrentQueue<UserTask>>();
 builder.Services.AddSingleton<ConnectedRoomsDictionary>();
 builder.Services.AddSingleton<ConnectionsDictionary>();
+builder.Services.AddSingleton<PreviousConnectionsDictionary>();
 builder.Services.AddHostedService<BackgroundTaskWorker>();
 
 builder.Services.AddDbContextFactory<MyDBContext>(options=> options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

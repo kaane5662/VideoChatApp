@@ -14,7 +14,7 @@ export default async function LandingNavbar(){
     
 
     return(
-        <nav className="fixed w-screen h-fit z-[100000]">
+        <nav className="fixed w-screen h-fit z-[100000] max-md:hidden">
             <div className=" px-12 p-4 flex justify-between items-center bg-complementary">
 
                 <Link href={"/"} className="text-2xl font-bold text-black flex items-center gap-4"> <img className=" w-16 h-fit" src="Logo.png"></img> TechMatch</Link>

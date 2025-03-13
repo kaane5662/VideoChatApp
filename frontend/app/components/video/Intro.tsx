@@ -6,7 +6,7 @@ export default function Intro({joinRoom}:{joinRoom:CallableFunction}){
             <div className="flex flex-col gap-1">
                 <h1 className=" text-4xl font-bold flex items-center gap-4"><FaVideo size={40}></FaVideo>Enter Session</h1>
                 <h1 className=" text-md text-slate-500">Welcome,  Ready to meet your technical match?</h1>
-                <button onClick={()=>joinRoom()} className="bg-secondary mt-6 shadow-md rounded-xl text-white p-4 hover:bg-opacity-70">Join Session</button>
+                <button onClick={()=>joinRoom()} className="bg-secondary mt-6 shadow-md rounded-xl text-white p-4 hover:bg-opacity-70 active:scale-95 duration-300">Join Session</button>
             </div>
 
         </main>

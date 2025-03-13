@@ -10,6 +10,7 @@ import { profile } from "console";
 import { toast } from "react-toastify";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { FaTrashCan } from "react-icons/fa6";
+import Loading from "@/app/components/ui/loading";
 // import { useUser } from "@/app/providers/UserContext";
 
 export default function MessageThread({params}:any){
@@ -173,7 +174,7 @@ export default function MessageThread({params}:any){
     },[OtherProfile])
 
     if(!OtherProfile) return(
-        <h1>Loading</h1>
+        <Loading/>
     )
     // useEffect(()=>{connection?.invoke("JoinDmThread",id)},[connection])
     return(
@@ -227,7 +228,7 @@ export default function MessageThread({params}:any){
                     })} is typing</h1>
                 ) }
                 
-                <div className=" flex flex-col gap-2 border-2 bg-slate-100 p-2 text-sm w-full shadow-md rounded-xl">
+                <div className=" flex flex-col gap-2 border-2  p-2 text-sm w-full rounded-md">
                     <input onFocus={startTyping } value={text} onChange={(e)=>setText(e.target.value)} name="text" placeholder="Send a message..." className="bg-white bg-opacity-0 text-sm w-full h-18 focus:ring-0 focus:outline-none"></input>
                     <button className="bg-secondary text-white shadow-md p-2 rounded-full ml-auto"><IoSend size={14}></IoSend></button>
 

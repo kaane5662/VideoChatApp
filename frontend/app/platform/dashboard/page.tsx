@@ -14,6 +14,7 @@ import Contact from "@/app/components/messages/Contact";
 import { getUser2 } from "@/app/services/auth";
 import dynamic from "next/dynamic";
 import SubscriptionNeeded from "@/app/components/subscription/SubscriptionNeeded";
+import ContactPreview from "@/app/components/dashboard/ContactPreview";
 const AdBanner = dynamic(() => import("../../components/ads/GoogleAdsense"), {
     ssr: false,
    });
@@ -45,11 +46,11 @@ export default async function Dashboard(){
             </div>
             <div className="flex flex-col gap-4">
                 <h1 className="font-bold text-xl flex gap-8">Catch Up</h1>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                     {RecentDms && RecentDms.length > 0 ? RecentDms.map((recentDm:IDirectMessage)=>{
                         return(
 
-                            <Contact directMessage={recentDm}></Contact>
+                            <ContactPreview directMessage={recentDm}></ContactPreview>
                         )
 
                     }):(<p className="text-slate-500 text-sm">Start messaging someone to start a conversation</p>)}

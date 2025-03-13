@@ -43,15 +43,18 @@ export async function signUp(FormData:FormData){
         
     }  
 }
-export async function signOut(cookie:string){
+export async function signOut(){
     // "use server"
-    console.log("Logging out")
-    console.log(cookie)
+
     try{
-        const res = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/api/user`,{withCredentials:true})
+        const res = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/api/user`,{
+            withCredentials:true
+        })
+        return res.data
         // redirect("/login")
     }catch(error:any){
         console.log(error.message)
+        throw new Error(error.message)
     }  
 }
 
@@ -64,6 +67,17 @@ export async function getUser2(cookie:string){
             { headers: { Cookie: cookie }})
         // redirect("/login")
         console.log(res.data)
+        return res.data
+    }catch(error:any){
+        console.log(error.message)
+        throw new Error(error?.response?.data?.message || "Unexpected error has occured")
+    }  
+}
+export async function getUser(){
+    // "use server"
+    try{
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/user`,
+            {withCredentials:true})
         return res.data
     }catch(error:any){
         console.log(error.message)

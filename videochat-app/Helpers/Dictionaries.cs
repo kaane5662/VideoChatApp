@@ -10,4 +10,10 @@ namespace Helpers {
     {
         
     }
+    public class PreviousConnectionsDictionary:ConcurrentDictionary<string,string>
+    {
+        
+    }
+
+    
 }

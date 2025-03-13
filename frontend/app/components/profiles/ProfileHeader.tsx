@@ -5,7 +5,7 @@ import { FaCircle } from "react-icons/fa";
 
 export default function ProfileHeader({Profile}:{Profile:IProfile}){
     return(
-        <Link href={`/platform/profile/${Profile?.id}`} className="rounded-md border-2 border-2 bg-white border-opacity-20 p-6 flex gap-4 hover:shadow-xl duration-300 hover:scale-105 flex-col relative  shadow-xl ">
+        <Link href={`/platform/profile/${Profile?.id}`} className="rounded-md border-2 border-2 bg-white border-opacity-20 p-6 flex gap-4 hover:shadow-xl duration-300 hover:scale-105 active:scale-95 flex-col relative  shadow-xl ">
             <div className="flex gap-4 items-center">
                 <div className="w-fit h-fit relative">
                     <img className="h-8 w-8    bg-secondary rounded-full">

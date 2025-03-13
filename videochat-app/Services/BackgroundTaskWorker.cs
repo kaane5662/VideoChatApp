@@ -20,13 +20,16 @@ namespace Services {
         private readonly MyDBContext _contextFactory;
         private readonly ConnectedRoomsDictionary _connectedRooms;
         private readonly ConnectionsDictionary _connections;
+        private readonly PreviousConnectionsDictionary _previousConnections;
+        
         private readonly IServiceProvider _serviceProvider;
 
-        public BackgroundTaskWorker(IHubContext<ChatHub> hubContext, ConcurrentQueue<UserTask> userQueue, IConfiguration configuration,  ConnectedRoomsDictionary connectedRooms, ConnectionsDictionary connections, IServiceProvider serviceProvider)
+        public BackgroundTaskWorker(IHubContext<ChatHub> hubContext, ConcurrentQueue<UserTask> userQueue, IConfiguration configuration,  ConnectedRoomsDictionary connectedRooms, ConnectionsDictionary connections, PreviousConnectionsDictionary previousConnections, IServiceProvider serviceProvider)
         {
             _hubContext = hubContext;
             _userTasks = userQueue;
             _connectedRooms = connectedRooms;
+            _previousConnections = previousConnections;
             _connections = connections;
             PineconeClient pc = new PineconeClient(configuration["Pinecone:ApiKey"]);
             _pcRooms = pc.Index("chatroom");
@@ -61,9 +64,17 @@ namespace Services {
                 count++;
                 if(count == 1) continue;
                 Console.WriteLine(""+similarProfile.Score.Value);
-                if(similarProfile.Score < .75) break;
+                if(similarProfile.Score < .7) break;
                 if(!_connections.ContainsKey(similarProfile.Id)) continue;
                 if(_connectedRooms.ContainsKey(similarProfile.Id)) continue;
+                // don't connect with last user
+                if(_previousConnections.TryGetValue(user.ConnectionId, out string prevConnectionId)){
+                    Console.WriteLine("Previous connection id" +prevConnectionId);
+                    if(prevConnectionId.Equals(_connections[similarProfile.Id])) {
+                        Console.WriteLine("Same user from last session, skipping");
+                        continue;
+                    }
+                }
                 // passed cases for pairing the user
                 string newRoomId = Guid.NewGuid().ToString();
                 Console.WriteLine($"Paired {user.IdentityUserId} with {similarProfile.Id}: {similarProfile.Score.Value}");
@@ -98,6 +109,9 @@ namespace Services {
                 
                 otherProfileData.SimilarityScore = similarProfile.Score.Value;
                 _connections.TryGetValue(similarProfile.Id, out var otherConnectionId);
+                
+                _previousConnections.AddOrUpdate(user.ConnectionId, otherConnectionId, (k,old)=>otherConnectionId);
+                _previousConnections.AddOrUpdate(otherConnectionId, user.ConnectionId, (k,old)=>user.ConnectionId);
                 _connectedRooms.AddOrUpdate(user.ConnectionId, newRoomId, (k,old)=>newRoomId);
                 _connectedRooms.AddOrUpdate(otherConnectionId, newRoomId, (k,old)=>newRoomId);
                 

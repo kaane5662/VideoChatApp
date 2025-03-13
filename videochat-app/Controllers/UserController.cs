@@ -102,12 +102,9 @@ public class UserController : ControllerBase {
     
     public async Task<IActionResult> LogOut() {
         try{
-            // string token = Request.Cookies["token"].ToString();  
-            
-            Response.Cookies.Append("token","", new CookieOptions{});
-            Response.Cookies.Append("test","jkrtkljklrtklhrtklhrtlkjlk", new CookieOptions{});
             Response.Cookies.Delete("token");
             Console.WriteLine("Logging out");
+            
             return Ok();
         }catch(Exception err){
             return BadRequest(err.Message);

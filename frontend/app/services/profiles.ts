@@ -5,7 +5,7 @@ export async function getProfile(id:string) {
     try{
         const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/profile/${id}`,{cache:"no-cache"})
         const data =  await res.json()
-        console.log(data)
+        console.log("El user data",data)
         return data
     }catch(error){
         console.log(error)
@@ -25,6 +25,7 @@ export async function getSimilarProfiles() {
 export async function getSimilarProfiles2(cookie:string,results:number=25) {
     try{
         const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/profile/similar?results=${results}`,{ headers: { Cookie: cookie }})
+        console.log("Profiles ", response.data)
         return response.data
     }catch(error){
         return error
@@ -33,10 +34,11 @@ export async function getSimilarProfiles2(cookie:string,results:number=25) {
 }
 export async function getSimilarProfilesToProfile(id:string,cookie:string) {
     try{
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/profile/similar/${id}`,{ headers: { Cookie: cookie }})
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/profile/similar/${id}?results=4`,{ headers: { Cookie: cookie }})
         console.log(response.data)
         return response.data || []
-    }catch(error){
+    }catch(error:any){
+        throw {error:error.response.data.error}
         console.log(error)
     }
 }
@@ -68,8 +70,8 @@ export async function getMyProfileClient() {
         
         const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/profile`,{withCredentials:true})
         return res.data
-    }catch(error){
-        console.log(error)
+    }catch(error:any){
+        throw new Error(error.message)
     }
 }
 

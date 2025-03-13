@@ -6,10 +6,13 @@ export default function Contact({directMessage}:{directMessage:IDirectMessage}){
     const router = useRouter()
     return(
 
-    <div onClick={()=>router.push(`/platform/messages/${directMessage.roomId}`)} className="flex gap-4 hover:bg-opacity-10 hover:cursor-pointer rounded-md duration-300 hover:bg-secondary bg-white">
+    <div onClick={()=>router.push(`/platform/messages/${directMessage.roomId}`)} className="flex gap-4 hover:bg-opacity-10 hover:cursor-pointer rounded-md duration-300 hover:bg-secondary bg-white active:scale-[97%]">
         
         <div className="flex gap-4  border-y p-4 w-full">
-        <img className="h-8 w-8 rounded-full bg-secondary"></img>
+            <div className="h-8 bg-secondary rounded-full w-8 relative">
+                <img className="h-full w-full rounded-full bg-opacity-0 bg-slate-50"></img>
+                <p className="text-white flex self-center justify-center top-0 bottom-0 left-0 right-0 absolute text-sm">{directMessage?.profileName?.substring(0,1)}</p>
+            </div>
             <div className="flex-col gap-2 flex">
                 <div className="flex gap-4">
                     <h3 className="text-xl font-bold">{directMessage.profileName}</h3>

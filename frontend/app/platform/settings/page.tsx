@@ -6,18 +6,27 @@ import { getBillingPortal } from "@/app/services/subscriptions";
 import { fetcher } from "@/app/utils/fetcher";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import useSWR from "swr";
 
 export default function Settings(){
     const [planPopup,setPlanPopup] = useState(false)
     const {data,isLoading,error} = useSWR(`${process.env.NEXT_PUBLIC_BASE_URL}/api/user`, fetcher)
     const searchParams= useSearchParams()
+    const [mounted,setMounted] = useState(false)
     useEffect(()=>{
-        
+        setMounted(true)
+    },[])
+    useEffect(()=>{
+        if(!mounted) return
         if( searchParams.get("displayPlans") == "yes"){
             setPlanPopup(true)
         }
-    },[searchParams])
+        if(searchParams.get("success")){
+            searchParams.get("success") == "yes" ? 
+            toast.success("Subscription purchased successfully. Please wait at least 5 minutes to update"): toast.error("Canceled checkout process")
+        }
+    },[mounted])
    
     if(isLoading) 
         return <Loading/>
