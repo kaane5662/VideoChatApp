@@ -73,14 +73,25 @@ public class UserController : ControllerBase {
         Console.WriteLine(userLogin.Email);
         var user = await _context.Users
         .FirstOrDefaultAsync(u => u.Email == userLogin.Email );
+        
         if (user == null){
             return BadRequest("User does not exist");
         }
+        if(user.LockoutEnd != null && user.LockoutEnd.Value.AddMinutes(5) > DateTime.UtcNow) return StatusCode(429,"Too many wrong attempts, try again in 5 minutes");
         var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(userLogin.Password));
         var passwordHash = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(userLogin.Password)));
+        
         Console.WriteLine(passwordHash);
         Console.WriteLine(user.PasswordHash);
         if (user.PasswordHash != passwordHash ) {
+            user.AccessFailedCount += 1;
+            if(user.AccessFailedCount >= 8){
+                Console.WriteLine("Too many attemps");
+                user.LockoutEnd = DateTime.UtcNow;
+                user.AccessFailedCount = 0;
+            }
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
             return BadRequest("Invalid password");
         }
         // Console.WriteLine(user.Id);
