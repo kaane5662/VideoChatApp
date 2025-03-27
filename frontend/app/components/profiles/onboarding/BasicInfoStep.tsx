@@ -27,7 +27,7 @@ export function BasicInfoStep({ data, updateData }: BasicInfoStepProps) {
       <div className="space-y-6">
         <div>
           <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
-          <p className="text-gray-500 mb-6">Let's start with some basic details about you.</p>
+          <p className="text-gray-500 mb-6">Let&apos;s start with some basic details about you.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

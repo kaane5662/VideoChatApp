@@ -20,7 +20,7 @@ export default function DescriptionStep({ formData, updateFormData }: StepProps)
   return (
     <div className="flex flex-col gap-4">
         <div className="flex gap-2 flex-col">
-            <h2 className="text-3xl font-semibold text-slate-900">Describe what you're looking for</h2>
+            <h2 className="text-3xl font-semibold text-slate-900">Describe what you&apos;re looking for</h2>
             <p className="text-slate-500">Tell us about your project and what you need in an cofounder.</p>
         </div>
 
@@ -28,7 +28,7 @@ export default function DescriptionStep({ formData, updateFormData }: StepProps)
         <textarea
           value={formData.description}
           onChange={(e) => updateFormData("description", e.target.value)}
-          placeholder="I'm looking for an AI cofounder who can help me with..."
+          placeholder="I&apos;m looking for an AI cofounder who can help me with..."
           className="w-full h-40 p-2 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:border-transparent resize-none"
           required
         />

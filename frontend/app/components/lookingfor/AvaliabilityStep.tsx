@@ -11,7 +11,7 @@ export default function AvailabilityStep({formData,updateFormData}:{formData:Onb
     return(
         <div className="flex flex-col gap-8 w-fit">
             <div className="flex flex-col gap-2">
-                <h1 className="font-bold text-2xl">What's your avaliabilty?</h1>
+                <h1 className="font-bold text-2xl">What&apos;s your avaliabilty?</h1>
                 <p className="text-slate-500">Let us know how much time you can dedicate to working with your technical match.</p>
             </div>
             <div className="flex flex-col gap-2">

@@ -624,12 +624,12 @@ export default function ProfileForm({ existingProfile}: ProfileFormProps) {
                 id="description"
                 value={profileData.description}
                 onChange={(e) => updateData({ description: e.target.value })}
-                placeholder="Tell potential co-founders about yourself, your background, and what you're looking to build..."
+                placeholder="Tell potential co-founders about yourself, your background, and what you&apos;re looking to build..."
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary min-h-[150px]"
                 required
               />
               <p className="text-sm text-gray-500">
-                Be specific about your goals, experience, and what you're looking for in a co-founder.
+                Be specific about your goals, experience, and what you&apos;re looking for in a co-founder.
               </p>
             </div>
 

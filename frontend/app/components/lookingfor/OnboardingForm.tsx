@@ -116,7 +116,7 @@ export default function OnboardingForm() {
 
         <div className=" p-8 bg-secondary border-b">
           <h1 className="text-white text-2xl font-bold ">Find Your AI Cofounder</h1>
-          <p className="text-slate-200">Tell us what you're looking for to find your perfect AI match</p>
+          <p className="text-slate-200">Tell us what you&apos;re looking for to find your perfect AI match</p>
         </div>
         <div className=" min-h-[320px] p-8">
           <AnimatePresence mode="wait">
