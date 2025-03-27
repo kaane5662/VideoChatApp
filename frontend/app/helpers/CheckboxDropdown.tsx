@@ -23,6 +23,7 @@ const CheckboxDropdown = ({ options, onSelectionChange,title,checked }:{options:
     <div className="relative w-full bg-white text-primary">
       <button className="dropdown-toggle border-2 p-1 rounded-md w-full flex text-center justify-center gap-2 justify-between  items-center text-sm" onClick={() => setIsOpen(!isOpen)}>{title} <FaCaretDown scale={20}/></button>
       {isOpen && (
+        
         <div className=" absolute disabled:scale-0  bg-white w-full p-4 rounded-sm z-50 shadow-md overflow-y-scroll max-h-[250px]">
           {options.map((option) => (
             <div key={option} className="flex gap-4 text-sm items-center ">

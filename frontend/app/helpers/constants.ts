@@ -5,6 +5,10 @@ interface Constants {
     frameworks: string[];
     roles: string[];
     availability: string[];
+    features:string[]
+    timezones:string[]
+    experience:string[]
+    commonSkills:string[]
   }
   
   export const constants: Constants = {
@@ -129,4 +133,49 @@ interface Constants {
       'Contract',
       'Internship',
     ],
+    features: [
+      'Profile Database',
+      'Direct Messages',
+      'AI Matches',
+      'Video Chat',
+      'Profile',
+      'Dashboard'
+    ],
+    timezones: [
+      "UTC",
+      "GMT",
+      "EST (UTC-5)",
+      "CST (UTC-6)",
+      "MST (UTC-7)",
+      "PST (UTC-8)",
+      "AST (UTC-4)",
+      "HST (UTC-10)",
+      "AKST (UTC-9)",
+      "EDT (UTC-4)",
+      "CDT (UTC-5)",
+      "MDT (UTC-6)",
+      "PDT (UTC-7)",
+      "BST (UTC+1)",
+      "CET (UTC+1)",
+      "EET (UTC+2)",
+      "IST (UTC+5:30)",
+      "CST (China, UTC+8)",
+      "JST (UTC+9)",
+      "AEST (UTC+10)",
+      "ACST (UTC+9:30)"
+    ],
+    experience:["Junior", "Mid-level", "Senior", "Lead", "Architect"],
+    commonSkills:["UI/UX Design",
+    "Video Editing",
+    "Marketing",
+    "Sales",
+    "Figma",
+    "Product Management",
+    "Data Analysis",
+    "SEO",
+    "Content Creation",
+    "Project Management",
+    "Public Speaking",
+    "Customer Support",]
+    
   };

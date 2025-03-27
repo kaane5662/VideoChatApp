@@ -1,4 +1,6 @@
 // "use client"
+import ProfileLookingForBanner from "@/app/components/lookingfor/ProfileLookingForBanner";
+import ProfileLookingFor from "@/app/components/lookingfor/ProfileLookingForHeader";
 import ProfileBanner from "@/app/components/profiles/ProfileBanner";
 import SimilarProfilesToProfile from "@/app/components/profiles/SimilarProfilesToProfile";
 import PaddedList from "@/app/helpers/PaddedList"
@@ -14,7 +16,9 @@ export default async function Profile({params}:any){
     return(
         <main className=" min-h-screen flex flex-col gap-8 items-center p-24 py-12 justify-center">
             <ProfileBanner ProfileData={ProfileData}/>
+            <ProfileLookingForBanner id={id}/>
             <SimilarProfilesToProfile id={id}/>
+            {/* <ProfileLookingFor/> */}
         </main>
     )
 }

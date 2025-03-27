@@ -16,6 +16,7 @@ export async function createDirectMessageThread(targetProfileId:number) {
         console.log("The data",res.data);
         return res.data
     }catch(error){
+        throw error
         console.log(error)
     }
 }

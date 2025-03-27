@@ -19,7 +19,7 @@ export default  function Login(){
         const formData = new FormData(e.target)
         try{
             await login(formData)
-            router.replace("/platform/dashboard")
+            location.href = "/platform/dashboard"
         }catch(error:any){
             setError(error.message)
         }finally{()=>setError('')}

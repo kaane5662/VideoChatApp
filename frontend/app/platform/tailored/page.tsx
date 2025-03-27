@@ -2,19 +2,32 @@
 import { useEffect, useState } from "react";
 import SimilarStep from "../../components/profiles/SimilarStep";
 import { getSimilarProfiles } from "../../services/profiles";
-import { IProfile } from "../../interfaces";
+import { ILookingFor, IProfile } from "../../interfaces";
 import ProfileBanner from "../../components/profiles/ProfileBanner";
 import ProfileHeader from "../../components/profiles/ProfileHeader";
 import { redirect, useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { Switch } from "@/app/components/ui/switch";
+import { getSimilarLookingForProfileData } from "@/app/services/lookingFor";
+import ProfileLookingFor from "@/app/components/lookingfor/ProfileLookingForHeader";
+import ProfileLookingForHeader from "@/app/components/lookingfor/ProfileLookingForHeader";
+import { FaCircle } from "react-icons/fa";
+import { AiOutlineLoading } from "react-icons/ai";
+
 
 
 export default function Tailored(){
     const router = useRouter()
-    const [Profiles,setProfiles]  = useState<IProfile[]>([])
+    const [Profiles,setProfiles]  = useState<IProfile[]|ILookingFor[]>([])
+    const [filter,setFilter] = useState("similar")
+
     const getMatchingProfiles = async ()=>{
+        setProfiles([])
         try{
-            const res = await getSimilarProfiles()
+           
+            const res = filter == "lookingForMe"? 
+            await  getSimilarLookingForProfileData():
+            await getSimilarProfiles(filter=="similar"?"similar":"lookingFor")
             console.log(res)
             setProfiles(res)
         }catch(err:any){
@@ -27,7 +40,7 @@ export default function Tailored(){
 
     useEffect(()=>{
         getMatchingProfiles()
-    },[])
+    },[filter])
 
     if(Profiles == null) redirect("/platform/profile")
     //convert to server component
@@ -48,14 +61,36 @@ export default function Tailored(){
             <div className="flex flex-col gap-2">
                 <h1 className="font-bold text-3xl">Your AI-Powered Matches</h1>
                 <h3 className="text-opacity-50 text-md text-black">Based on your profile, we’ve found these co-founders for you.</h3>
+                <div className="flex gap-2 items-center">
+                    <div className="flex text-sm gap-2 items-center">
+                        <button onClick={()=>setFilter("similar")} disabled={filter == "similar"} className="border-2 disabled:bg-secondary duration-300 rounded-full w-4 h-4"/>
+                        <p>Similar Skillset</p>
+                    </div>
+                    <div className="flex text-sm gap-2 items-center">
+                        <button onClick={()=>setFilter("lookingFor")} disabled={filter == "lookingFor"} className="border-2 disabled:bg-secondary duration-300 rounded-full w-4 h-4"/>
+                        <p>You are Looking For</p>
+                    </div>
+                    <div className="flex text-sm gap-2 items-center">
+                        <button onClick={()=>setFilter("lookingForMe")} disabled={filter == "lookingForMe"} className="border-2 disabled:bg-secondary duration-300 rounded-full w-4 h-4"/>
+                        <p>Looking For you</p>
+                    </div>
+                    
+                </div>
             </div>
-            <div className="grid grid-cols-3 gap-4">
-                {Profiles.map((profile, index)=>{
-                    return(
-                        <ProfileHeader key={index} Profile={profile}/>
-                    )
-                })}
-            </div>
+            {Profiles.length > 0 ?(
+                <div className="grid grid-cols-3 gap-4">
+                    {Profiles.map((profile:any, index)=>{
+                        return(
+                            filter == "lookingForMe"?<ProfileLookingForHeader lookingFor={profile} key={index}/> :<ProfileHeader key={index} Profile={profile}/>
+                        )
+                    })}
+                </div>
+
+            ):(
+                <div className="font-bold w-full justify-center flex items-center h-full ">
+                        <AiOutlineLoading size={30} className="animate-spin text-secondary"/>
+                    </div>
+            )}
             <h1></h1>
         </main>
     )

@@ -44,6 +44,68 @@ namespace videochat_app.Migrations
                     b.ToTable("DirectMessages");
                 });
 
+            modelBuilder.Entity("Models.LookingForProfile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Availability")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Experience")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string[]>("Frameworks")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<string>("IdentityUserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Industry")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ProfileId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string[]>("Skills")
+                        .HasColumnType("text[]");
+
+                    b.Property<string>("Timezone")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdentityUserId");
+
+                    b.HasIndex("ProfileId");
+
+                    b.ToTable("LookingForProfiles");
+                });
+
             modelBuilder.Entity("Models.Message", b =>
                 {
                     b.Property<int>("Id")
@@ -78,7 +140,7 @@ namespace videochat_app.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Avaliability")
+                    b.Property<string>("Availability")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -98,6 +160,10 @@ namespace videochat_app.Migrations
 
                     b.Property<string[]>("DevelopmentInterests")
                         .HasColumnType("text[]");
+
+                    b.Property<string>("Experience")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("FirstName")
                         .HasColumnType("text");
@@ -139,6 +205,13 @@ namespace videochat_app.Migrations
 
                     b.Property<int>("Sessions")
                         .HasColumnType("integer");
+
+                    b.Property<string[]>("Skills")
+                        .HasColumnType("text[]");
+
+                    b.Property<string>("Timezone")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("TwitterUrl")
                         .IsRequired()
@@ -256,6 +329,33 @@ namespace videochat_app.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Models.UserFeedback", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Feature")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Feedback")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserFeedback");
                 });
 
             modelBuilder.Entity("Models.Project", b =>

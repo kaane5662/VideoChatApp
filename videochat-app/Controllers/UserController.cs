@@ -110,6 +110,22 @@ public class UserController : ControllerBase {
             return BadRequest(err.Message);
         }
     }
+    [Authorize]
+    [HttpPost("feedback")]
+    
+    public async Task<IActionResult> SendFeedback([FromBody] UserFeedbackInput feedbackInput) {
+        try{
+            Console.WriteLine("Passed input check");
+            // await _context.UserFeedback.AddAsync(new UserFeedback{
+            //     Feedback=feedbackInput.Feedback,
+            //     Feature=feedbackInput.Feature
+            // });
+            
+            return Ok();
+        }catch(Exception err){
+            return BadRequest(err.Message);
+        }
+    }
 
     [Authorize]
     [HttpGet("")]

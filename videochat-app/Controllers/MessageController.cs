@@ -31,6 +31,7 @@ public class MessagesController : ControllerBase {
     public async Task<IActionResult> GetDirectMessages([FromQuery] int threads=-1) {
         
         try{
+            Console.WriteLine("N threads"+threads);
             string IdentityUserId = HttpContext.Items["UserId"]?.ToString();
             Console.WriteLine("Im getting the direct messages");
             var profile = await _context.Profiles.FirstAsync(p=>p.IdentityUserId == IdentityUserId);
@@ -50,13 +51,15 @@ public class MessagesController : ControllerBase {
                 ProfileIndustry = p.Industry,
                 Type=dm.Type != null ? dm.Type: "Cold"
             }
-            );
-            if(threads > -1)
-                dmsQuery.Take(threads);
-            var dmsRes = await dmsQuery.ToListAsync();
+            ).AsQueryable();
+            if(threads > -1){
+                var res = await dmsQuery.Take(threads).ToListAsync();
+                return Ok(res);
+            }else{
+                var res = await dmsQuery.ToListAsync();
+                return Ok(res);
+            }
             
-            Console.WriteLine("Done getting the direct messages"+dmsRes);
-            return Ok(dmsRes);
         }catch(Exception err){
             Console.WriteLine(err.ToString());
             return BadRequest(err.Message);
@@ -134,7 +137,7 @@ public class MessagesController : ControllerBase {
             var otherProfileId = request["targetProfileId"];
             var user = _context.Users.First(u=>u.Id==IdentityUserId);
             if(!user.Subscribed)
-                return Forbid("Cold messaging requires a subscription");
+                return Forbid();
             var profile = await _context.Profiles.FirstAsync(p=>p.IdentityUserId == IdentityUserId);
             var existingDm = await _context.DirectMessages.FirstOrDefaultAsync(dm=> 
             (dm.Profile1Id == profile.Id && dm.Profile2Id == otherProfileId) || (dm.Profile1Id == otherProfileId && dm.Profile2Id == profile.Id)

@@ -8,7 +8,7 @@ import { getMyProfile, getMyProfileClient } from "@/app/services/profiles";
 import { cookies } from "next/headers";
 import { profile } from "console";
 import { toast } from "react-toastify";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaCircle, FaEdit, FaTrash } from "react-icons/fa";
 import { FaTrashCan } from "react-icons/fa6";
 import Loading from "@/app/components/ui/loading";
 // import { useUser } from "@/app/providers/UserContext";
@@ -180,14 +180,18 @@ export default function MessageThread({params}:any){
     return(
         <main className="flex flex-col justify-between h-full">
             <div className="flex gap-4 items-center w-full border-y-2 p-2">
-                <div className="relative h-fit">
-                    <img className="h-8 w-8 bg-secondary rounded-full"/>
-                  
-
+                <div className="h-8 bg-secondary rounded-full w-8 relative">
+                    <img className="h-full w-full rounded-full bg-opacity-0 bg-slate-50"></img>
+                    <p className="text-white flex self-center justify-center top-0 bottom-0 left-0 right-0 absolute text-sm">{OtherProfile?.firstName?.substring(0,1)}</p>
                 </div>
                 <div className="flex flex-col gap-0">
                         <h1 className="font-semibold text-xl">{OtherProfile.firstName+" "+OtherProfile.lastName}</h1> 
-                    <p className="text-sm text-slate-500">{OtherProfile.industry}</p> 
+                        <div className="flex items-center gap-2 text-sm flex-wrap">
+                                <p className=" text-slate-500">{OtherProfile?.industry}</p>
+                                <FaCircle className="text-slate-300" size={5}/>
+                                <p className=" text-slate-500">{OtherProfile.currentRole}</p>
+                        </div>
+                    
 
                 </div>
             </div>
@@ -197,7 +201,7 @@ export default function MessageThread({params}:any){
                     return(
                         <div key={index} className={`flex relative flex-col gap-1 w-[50%] ${message.fromProfileId == MyProfile.id ? "ml-auto":" "}`}>
                             {/* <p className="text-black">{message.id}</p> */}
-                            {message.fromProfileId == MyProfile.id && (<div className="flex gap-4 items-center text-xs">
+                            {message.fromProfileId == MyProfile.id && (<div className=" px-2 flex gap-4 items-center text-xs">
                                 <button className="text-slate-500 hover:scale-105" onClick={()=>deleteMessage(message.id)}><FaTrashCan/></button>
                                 <button className="text-slate-500 hover:scale-105" onClick={()=>setEditing(message.id)}><FaEdit/></button>
                             </div>)}
@@ -210,7 +214,7 @@ export default function MessageThread({params}:any){
 
                             <div>
                                 <p className={`px-4 p-2 text-sm w-fit rounded-xl shadow-md ${message.fromProfileId == MyProfile.id ? "bg-secondary text-white":" bg-slate-100 text-black"}`}>{message.text}</p>
-                                <h3 className="text-xs text-slate-500">{ (message.firstName || (message.fromProfileId == OtherProfile.id ? OtherProfile.firstName : MyProfile.firstName)) + " " + new Date(message.createdAt).toLocaleString()} </h3>
+                                <h3 className="text-xs p-2 text-slate-500">{ (message.firstName || (message.fromProfileId == OtherProfile.id ? OtherProfile.firstName : MyProfile.firstName)) + " " + new Date(message.createdAt).toLocaleString()} </h3>
                             </div>
                             )}
                         </div>

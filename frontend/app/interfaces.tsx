@@ -10,7 +10,7 @@ export interface IProfile {
     description: string,
     programmingLanguages: string[],
     developmentInterests: string[],
-    avaliability: string,
+    availability: string,
     id:number,
     identityUserId: string,
     similarityScore: number | null,
@@ -20,6 +20,9 @@ export interface IProfile {
     linkedInUrl: string,
     portfolioUrl: string,
     twitterUrl: string,
+    skills: string[],
+    timezone: string,
+    experience: string,
 }
 
 export interface IProfileSearch {
@@ -63,4 +66,19 @@ export interface IUser{
     subscribed:Boolean,
     annualPlan:Boolean,
     id:string
+}
+export interface ILookingFor{
+    firstName: string,
+    lastName: string,
+    industry: string,
+    role: string,
+    frameworks: string[],
+    description: string,
+    avaliability: string,
+    id:number,
+    identityUserId: string,
+    profileId:number,
+    similarityScore?:number
+    skills:string[]
+    experience:string
 }

@@ -8,6 +8,7 @@ using OpenAI.Embeddings;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using System.Text.Json;
+using Helpers;
 
 [Route("/api/[controller]")]
 [ApiController]
@@ -36,19 +37,22 @@ public class ProfileController : ControllerBase {
             Console.WriteLine("The user id: "+IdentityUserId);
             // Console.WriteLine("The profile:"+JsonConvert.SerializeObject(profileInput));
             // string serializedInput = JsonConvert.SerializeObject(profileInput);
-            if(await _context.Profiles.AnyAsync(p=> p.IdentityUserId == IdentityUserId)) return BadRequest();
+            if(await _context.Profiles.AnyAsync(p=> p.IdentityUserId == IdentityUserId)) return BadRequest("Profile already exists");
             var newProfile = await _context.Profiles.AddAsync(new Profile{
                 IdentityUserId = IdentityUserId,
                 ProgrammingLanguages = profileInput.ProgrammingLanguages,
                 Frameworks = profileInput.Frameworks,
                 CurrentRole = profileInput.CurrentRole,
+                Skills = profileInput.Skills,
+                Experience = profileInput.Experience,
+                Timezone = profileInput.Timezone,
                 // DatabasesUsed = profileInput.DatabasesUsed,
                 Certifications = profileInput.Certifications,
                 Industry = profileInput.Industry,
                 DevelopmentInterests = profileInput.DevelopmentInterests,
                 // Languages = profileInput.Languages,
                 Description = profileInput.Description,
-                Avaliability = profileInput.Avaliability,
+                Availability = profileInput.Availability,
                 FirstName = profileInput.FirstName,
                 LastName = profileInput.LastName,
                 GithubUrl = profileInput.GithubUrl,
@@ -57,7 +61,7 @@ public class ProfileController : ControllerBase {
                 TwitterUrl = profileInput.TwitterUrl,
             });
             await _context.SaveChangesAsync();
-            ProfileDTO copy = new ProfileDTO(profileInput);
+            ProfileDTO copy = new ProfileDTO(newProfile.Entity);
             // var input = pro
 
             string serializedInput = JsonConvert.SerializeObject(copy);
@@ -68,7 +72,8 @@ public class ProfileController : ControllerBase {
                 Vectors=new[]{
                     new Vector{
                         Id=IdentityUserId,//add user id
-                        Values = embedding.Vector
+                        Values = embedding.Vector,
+                        Metadata = newProfile.Entity.ToPineconeMetaData()
                     }
                 }    
             });
@@ -150,16 +155,26 @@ public class ProfileController : ControllerBase {
     }
     [HttpGet("similar/")]
     [Authorize]
-    public async Task<IActionResult> GetSimilarProfiles([FromQuery] uint results = 25){
+    public async Task<IActionResult> GetSimilarProfiles([FromQuery] uint results = 25,[FromQuery] string lookingFor="similar"){
         Console.WriteLine(results);
         try{
             HttpContext.Items.TryGetValue("UserId", out var UserId);
             var user = await _context.Users.FirstAsync(u=>u.Id==UserId);
+            
             if(!user.Subscribed)
                 return StatusCode(403,"User not subscribed");
-            FetchResponse profile = await _pc.FetchAsync(new FetchRequest{
-                Ids=new[] { (string) UserId},
-            });
+            FetchResponse profile;
+            
+            if(lookingFor=="similar"){
+              profile=  await _pc.FetchAsync(new FetchRequest{
+                    Ids=new[] { (string) UserId},
+                });
+
+            }else{
+                profile=  await _pc.FetchAsync(new FetchRequest{
+                    Ids=new[] { (string) "lookingfor"+UserId},
+                });
+            }
             var profileVector = profile.Vectors.First().Value.Values;
             Console.WriteLine("Profile Vector: "+profileVector.ToString());
             QueryResponse matchingIds = await _pc.QueryAsync(new QueryRequest{
@@ -194,7 +209,7 @@ public class ProfileController : ControllerBase {
 
     [HttpGet("search")]
     // [Authorize]
-    public async Task<IActionResult> SearchProfiles([FromQuery] string[] avaliability, [FromQuery] string[] industry, [FromQuery] string[] languages, [FromQuery] string[] interests, [FromQuery] string[] currentRole,[FromQuery] int page){
+    public async Task<IActionResult> SearchProfiles([FromQuery] string[] Availability, [FromQuery] string[] industry, [FromQuery] string[] languages, [FromQuery] string[] interests, [FromQuery] string[] currentRole,[FromQuery] int page){
         
         try{
             HttpContext.Items.TryGetValue("UserId", out var UserId);
@@ -204,8 +219,8 @@ public class ProfileController : ControllerBase {
             
             var query = _context.Profiles.AsQueryable();
          
-            if (avaliability != null && avaliability.Length > 0)
-                query = query.Where(p => avaliability.Any(avail => p.Avaliability.Contains(avail)));
+            if (Availability != null && Availability.Length > 0)
+                query = query.Where(p => Availability.Any(avail => p.Availability.Contains(avail)));
 
             if (languages != null && languages.Length > 0)
                 query = query.Where(p => languages.Any(lang => p.ProgrammingLanguages.Contains(lang)));
@@ -247,8 +262,10 @@ public class ProfileController : ControllerBase {
             profile.Industry = profileInput.Industry ?? profile.Industry;
             profile.DevelopmentInterests = profileInput.DevelopmentInterests ?? profile.DevelopmentInterests;
             profile.Languages = profileInput.Languages ?? profile.Languages;
+            profile.Skills = profileInput.Skills ?? profile.Skills;
+            profile.Experience = profileInput.Experience ?? profile.Experience;
             profile.Description = profileInput.Description ?? profile.Description;
-            profile.Avaliability = profileInput.Avaliability ?? profile.Avaliability;
+            profile.Availability = profileInput.Availability ?? profile.Availability;
             profile.FirstName = profileInput.FirstName ?? profile.FirstName;
             profile.LastName = profileInput.LastName ?? profile.LastName;
             profile.GithubUrl = profileInput.GithubUrl ?? profile.GithubUrl;
@@ -265,6 +282,7 @@ public class ProfileController : ControllerBase {
             await _pc.UpdateAsync(new UpdateRequest{
                     Id = IdentityUserId,
                     Values = embedding.Vector,   
+                    SetMetadata = profile.ToPineconeMetaData()
             });
             return Ok();
         }catch(Exception err){

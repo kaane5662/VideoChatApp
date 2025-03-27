@@ -12,9 +12,11 @@ export async function getProfile(id:string) {
     }
 }
 
-export async function getSimilarProfiles() {
+export async function getSimilarProfiles(lookingFor:string) {
+    
+    console.log("Loonig fofr", lookingFor)
     try{
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/profile/similar`,{withCredentials:true})
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/profile/similar?lookingFor=${lookingFor}`,{withCredentials:true})
         return response.data
     }catch(error:any){
         throw error
@@ -71,7 +73,10 @@ export async function getMyProfileClient() {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/api/profile`,{withCredentials:true})
         return res.data
     }catch(error:any){
-        throw new Error(error.message)
+        throw {
+            error:error.message,
+            status:404
+        }
     }
 }
 
@@ -102,6 +107,7 @@ export async function createProfile(profileData:IProfile) {
         if(error?.response?.data){
             throw new Error(error?.response?.data)
         }
+        throw new Error("Unexpected error has occured")
     }
 }
 export async function updateProfile(profileData:IProfile) {

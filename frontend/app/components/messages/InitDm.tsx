@@ -5,6 +5,7 @@ import { createDirectMessageThread } from "@/app/services/messages"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { FaSpinner } from "react-icons/fa"
+import { toast } from "react-toastify"
 
 export default function InitDm({profileId}:{profileId:number}){
     const router = useRouter()
@@ -16,6 +17,11 @@ export default function InitDm({profileId}:{profileId:number}){
             var newRoomId:IDirectMessage = await createDirectMessageThread(profileId)
             router.push(`/platform/messages/${newRoomId  }`)
         }catch(err:any){
+            if(err.status == 403){
+                toast.error("Must have subscription to cold message")
+                router.push(`/platform/settings?displayPlans=yes`)
+            }
+            
             console.log(err.message)
         }
         setLoading(false)

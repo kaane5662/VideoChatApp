@@ -7,7 +7,9 @@ namespace Models {
             this.Industry = profile.Industry;
             this.DevelopmentInterests = profile.DevelopmentInterests;
             this.Description = profile.Description;
-            this.Avaliability = profile.Avaliability;
+            this.Availability = profile.Availability;
+            this.Experience = profile.Experience;
+            this.Skills = profile.Skills;
         }
         public string[]? ProgrammingLanguages {get; set;}
         public string[]? Frameworks {get; set;}
@@ -15,7 +17,9 @@ namespace Models {
         public string? Industry {get; set;}
         public string[]? DevelopmentInterests {get; set;}
         public string? Description {get; set;}
-        public string? Avaliability {get; set;}
+        public string? Availability {get; set;}
+        public string? Experience {get;set;}
+        public string[]? Skills {get;set;}
 
     }
 }

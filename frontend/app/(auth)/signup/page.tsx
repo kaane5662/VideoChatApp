@@ -42,17 +42,17 @@ export default function SignUp(){
                 <div className="flex gap-4 flex-col">
                     <div className="flex gap-2 flex-col">
                         <h2 className="text-sm ">Email</h2>
-                        <input name="Email" type="text" className="w-full p-2 text-md bg-opacity-0 border-2 border-black border-opacity-15 rounded-xl shadow-md bg-slate-50"></input>
+                        <input placeholder="Enter an email" name="Email" type="text" className="w-full p-2 text-md bg-opacity-0 border-2 border-black border-opacity-15 rounded-xl shadow-md bg-slate-50"></input>
 
                     </div>
                     <div className="flex gap-2 flex-col">
                         <h2 className="text-sm ">Password</h2>
-                        <input name="Password" type="password" className="w-full p-2 text-md bg-opacity-0 border-2 border-black border-opacity-15 rounded-xl shadow-md bg-slate-50"></input>
+                        <input placeholder="Enter an password" name="Password" type="password" className="w-full p-2 text-md bg-opacity-0 border-2 border-black border-opacity-15 rounded-xl shadow-md bg-slate-50"></input>
 
                     </div>     
                     <div className="flex gap-2 flex-col">
                         <h2 className="text-sm ">Confirm Password</h2>
-                        <input name="ConfirmPassword" type="password" className="w-full p-2 text-md bg-opacity-0 border-2 border-black border-opacity-15 rounded-xl shadow-md bg-slate-50"></input>
+                        <input placeholder="Confirm your password" name="ConfirmPassword" type="password" className="w-full p-2 text-md bg-opacity-0 border-2 border-black border-opacity-15 rounded-xl shadow-md bg-slate-50"></input>
 
                     </div>     
                 </div>

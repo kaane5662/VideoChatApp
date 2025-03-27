@@ -101,7 +101,7 @@ namespace SignalRChat {
 
         }
 
-        public async Task JoinPool(){
+        public async Task JoinPool(bool lookingFor = false){
             Console.WriteLine(Context.ConnectionId+" joined pool");
             string IdentityUserId = Context.GetHttpContext().Items["UserId"]?.ToString();
             var user = await _context.Users.FirstOrDefaultAsync(u=>u.Id == IdentityUserId);
@@ -116,7 +116,7 @@ namespace SignalRChat {
                     ["status"] = new("avaliable")
                 }
             });
-            _userTasks.Enqueue(new UserTask{ConnectionId=Context.ConnectionId, IdentityUserId=IdentityUserId});
+            _userTasks.Enqueue(new UserTask{ConnectionId=Context.ConnectionId, IdentityUserId=IdentityUserId, UsingLookingFor=lookingFor});
            
         }
 
@@ -287,7 +287,10 @@ namespace SignalRChat {
         public async Task SendIceCandidate(string candidate)
         {
             // Console.WriteLine("Sending ICE canidate");
-            await Clients.OthersInGroup(_connectedRooms[Context.ConnectionId]).SendAsync("ReceiveCandidate", candidate);
+            if(_connectedRooms.TryGetValue(Context.ConnectionId, out var roomId)){
+                await Clients.OthersInGroup(roomId).SendAsync("ReceiveCandidate", candidate);
+
+            }
             // Console.WriteLine("Sent ICE success");
         }
 

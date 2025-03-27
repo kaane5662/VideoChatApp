@@ -8,6 +8,7 @@ public class UserTask{
     public required string ConnectionId { get; set; }
     public required string IdentityUserId { get; set; }
     public int Retires {get; set; } = 10;
+    public bool UsingLookingFor = false;
 }
 
 namespace Services {
@@ -41,12 +42,28 @@ namespace Services {
         private async Task<bool> matchedUser(UserTask user, MyDBContext _context){
             
             if(_connectedRooms.ContainsKey(user.ConnectionId)) return true;
-            FetchResponse profile = await _pcProfiles.FetchAsync(new FetchRequest{
-                Ids=new[] { (string) user.IdentityUserId},
-            });
+            FetchResponse profile;
+            if(user.UsingLookingFor){
+                Console.WriteLine(user.IdentityUserId+" using preferences:"+user.UsingLookingFor);
+                var lookingProfile = await _pcProfiles.FetchAsync(new FetchRequest{
+                    Ids=new[] { (string) "lookingfor"+user.IdentityUserId},
+                });
+                Console.WriteLine(lookingProfile);
+                if(lookingProfile.Vectors.Count == 0) {
+                    await _hubContext.Clients.Client(user.ConnectionId).SendAsync(
+                        "onError","You did not set any preferences",404);
+                    return true; //dont retry
+                }
+                profile= lookingProfile;
+            }else{
+                Console.WriteLine(user.IdentityUserId+" using preferences:"+user.UsingLookingFor);
+                profile = await _pcProfiles.FetchAsync(new FetchRequest{
+                    Ids=new[] { (string) user.IdentityUserId},
+                });
+            }
             var profileData = _context.Profiles.First(p=>p.IdentityUserId==user.IdentityUserId);
             float[] profileVector = profile.Vectors.First().Value.Values.ToArray();
-            
+
             //get matching profile vectors
             QueryResponse similarProfiles = await _pcProfiles.QueryAsync(new QueryRequest{
                 Vector=profileVector,
@@ -55,7 +72,11 @@ namespace Services {
                 Filter = new Pinecone.Metadata{
                     ["status"] = new Pinecone.Metadata{
                         ["$eq"] = "avaliable"
-                    }
+                    },
+                    ["type"] = new Pinecone.Metadata{
+                        ["$ne"] = "looking"
+                    },
+                    
                 }
             });
             var similarProfilesList = similarProfiles.Matches.ToList();
@@ -75,11 +96,12 @@ namespace Services {
                         continue;
                     }
                 }
+                _connections.TryGetValue(similarProfile.Id, out var otherConnectionId);
                 // passed cases for pairing the user
                 string newRoomId = Guid.NewGuid().ToString();
                 Console.WriteLine($"Paired {user.IdentityUserId} with {similarProfile.Id}: {similarProfile.Score.Value}");
                 await _hubContext.Groups.AddToGroupAsync(user.ConnectionId, newRoomId);
-                await _hubContext.Groups.AddToGroupAsync(_connections[similarProfile.Id], newRoomId);
+                await _hubContext.Groups.AddToGroupAsync(otherConnectionId, newRoomId);
                 
                 
                 var updateUser =  _pcProfiles.UpdateAsync(new UpdateRequest{
@@ -108,7 +130,7 @@ namespace Services {
                 profileData.SimilarityScore = similarProfile.Score.Value;
                 
                 otherProfileData.SimilarityScore = similarProfile.Score.Value;
-                _connections.TryGetValue(similarProfile.Id, out var otherConnectionId);
+                
                 
                 _previousConnections.AddOrUpdate(user.ConnectionId, otherConnectionId, (k,old)=>otherConnectionId);
                 _previousConnections.AddOrUpdate(otherConnectionId, user.ConnectionId, (k,old)=>user.ConnectionId);

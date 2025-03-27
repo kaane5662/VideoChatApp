@@ -17,7 +17,11 @@ namespace Models {
         public string[]? DevelopmentInterests {get; set;}
         public string[]? Languages {get; set;}
         public required string Description {get; set;}
-        public required string Avaliability {get; set;}
+        // public required string Avaliability {get; set;}
+        public required string Availability {get; set;}
+        public required string Experience {get;set;}
+        public string[]? Skills {get;set;}
+        public required string Timezone {get;set;}
         public Project[]? projects{get; set;}
         public string[]? DatabasesUsed {get; set;}
         public  string[]? Certifications {get; set;}

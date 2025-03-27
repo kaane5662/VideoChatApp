@@ -21,12 +21,12 @@ const AdBanner = dynamic(() => import("../../components/ads/GoogleAdsense"), {
 
 export default async function Dashboard(){
     const promise1 = getMyProfile(cookies().toString());
-    const promise2 = getDirectMessages(cookies().toString(),2);
+    const promise2 = getDirectMessages(cookies().toString(),3);
     const promise3 = getSimilarProfiles2(cookies().toString(),3+1);
     const promise4 = getUser2(cookies().toString())
     
     const [Profile,RecentDms,ReccomendedProfiles,User] = await Promise.all([promise1,promise2,promise3,promise4])
-    if(Profile == null) return redirect("/platform/profile")
+    
     return(
         <main className="  min-h-screen p-12 gap-8 flex flex-col ">
             {/* <Navbar></Navbar> */}

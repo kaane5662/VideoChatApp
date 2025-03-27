@@ -84,6 +84,21 @@ export async function getUser(){
         throw new Error(error?.response?.data?.message || "Unexpected error has occured")
     }  
 }
+export async function submitFeedback(feebackObj:any){
+    // "use server"
+    try{
+        const res = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/user/feedback`, feebackObj,
+            {withCredentials:true})
+        return res.data
+    }catch(error:any){
+        if(error?.response?.data.errors){
+            const keys = Object.values(error.response.data.errors)
+            throw new Error(keys[0] as string)
+        }
+        console.log(error.message)
+        throw new Error(error?.response?.data?.message || "Unexpected error has occured")
+    }  
+}
 
 export async function googleOAuth(){ 
     window.location.href = `http://localhost:3000/api/user/auth/go`       
